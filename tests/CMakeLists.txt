@@ -20,4 +20,9 @@ target_link_libraries(test_tesseract_smoke
 )
 target_compile_features(test_tesseract_smoke PRIVATE cxx_std_17)
 
-catch_discover_tests(test_tesseract_smoke)
+# DISCOVERY_MODE PRE_TEST defers enumeration to ctest run-time, avoiding the
+# "DLLs not on PATH" problem that occurs when cmake tries to execute the binary
+# at build time on Windows.
+catch_discover_tests(test_tesseract_smoke
+    DISCOVERY_MODE PRE_TEST
+)

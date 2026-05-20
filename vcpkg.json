@@ -1,6 +1,7 @@
 {
   "name": "cellforge",
   "version": "0.1.0",
+  "builtin-baseline": "d09977e63111355bf0239592f47062b1ec3f767f",
   "description": "CellForge robotics application (Tesseract-based)",
   "dependencies": [
     "eigen3",

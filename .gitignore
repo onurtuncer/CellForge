@@ -55,6 +55,10 @@ Makefile
 install_manifest.txt
 compile_commands.json
 
+# Local build helper scripts (machine-specific paths)
+build_configure.bat
+build_build.bat
+
 # Temporary files
 *.tmp
 *.log

@@ -19,6 +19,19 @@
       }
     },
     {
+      "name": "windows-nmake-x64-release",
+      "displayName": "Windows NMake x64 Release",
+      "description": "NMake + MSVC — run from a Developer Command Prompt or after vcvarsall.bat x64",
+      "generator": "NMake Makefiles",
+      "binaryDir": "${sourceDir}/build/nmake-release",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-release",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets"
+      }
+    },
+    {
       "name": "windows-ninja-x64-release",
       "displayName": "Windows Ninja x64 Release",
       "description": "Ninja + MSVC (run from Developer PowerShell), Release",
@@ -50,6 +63,10 @@
       "name": "windows-vs2022-x64-release",
       "configurePreset": "windows-vs2022-x64-release",
       "configuration": "Release"
+    },
+    {
+      "name": "windows-nmake-x64-release",
+      "configurePreset": "windows-nmake-x64-release"
     },
     {
       "name": "windows-ninja-x64-release",

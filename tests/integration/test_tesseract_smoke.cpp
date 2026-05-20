@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include <tesseract/common/types.h>
+#include <tesseract/common/eigen_types.h>
 #include <tesseract/scene_graph/graph.h>
 #include <tesseract/scene_graph/joint.h>
 #include <tesseract/scene_graph/link.h>
