@@ -44,6 +44,9 @@ build/
 Build/
 build-*/
 
+# Vendor staging prefix (ExternalProject install tree)
+vendor_install/
+
 # CMake generated files
 CMakeFiles/
 CMakeCache.txt

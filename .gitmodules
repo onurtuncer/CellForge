@@ -1,0 +1,9 @@
+[submodule "vendor/tesseract"]
+	path = vendor/tesseract
+	url = https://github.com/tesseract-robotics/tesseract.git
+[submodule "vendor/ros_industrial_cmake_boilerplate"]
+	path = vendor/ros_industrial_cmake_boilerplate
+	url = https://github.com/ros-industrial/ros_industrial_cmake_boilerplate.git
+[submodule "vendor/opw_kinematics"]
+	path = vendor/opw_kinematics
+	url = https://github.com/Jmeyer1292/opw_kinematics.git

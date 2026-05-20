@@ -1,0 +1,35 @@
+{
+  "name": "cellforge",
+  "version": "0.1.0",
+  "description": "CellForge robotics application (Tesseract-based)",
+  "dependencies": [
+    "eigen3",
+    "cereal",
+    "console-bridge",
+    {
+      "name": "bullet3",
+      "features": ["multithreading", "double-precision", "rtti"]
+    },
+    "fcl",
+    "octomap",
+    "yaml-cpp",
+    "benchmark",
+    "tinyxml2",
+    "assimp",
+    "orocos-kdl",
+    "pcl",
+    "lapack-reference",
+    "boost-dll",
+    "boost-filesystem",
+    "boost-program-options",
+    "boost-graph",
+    "boost-stacktrace",
+    "urdfdom",
+    {
+      "name": "ccd",
+      "features": ["double-precision"]
+    },
+    "gtest",
+    "catch2"
+  ]
+}
