@@ -7,3 +7,6 @@
 [submodule "vendor/opw_kinematics"]
 	path = vendor/opw_kinematics
 	url = https://github.com/Jmeyer1292/opw_kinematics.git
+[submodule "vendor/boost_plugin_loader"]
+	path = vendor/boost_plugin_loader
+	url = https://github.com/tesseract-robotics/boost_plugin_loader.git
