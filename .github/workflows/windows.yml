@@ -1,0 +1,62 @@
+name: Windows
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: MSVC 2022 x64 Release
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Install all binary dependencies via vcpkg in classic mode.
+      # Using explicit package list (not manifest mode) avoids builtin-baseline
+      # registry-sync issues across vcpkg versions.
+      - name: Install vcpkg dependencies
+        uses: johnwason/vcpkg-action@v8
+        with:
+          pkgs: >-
+            fcl bullet3[multithreading,double-precision,rtti] octomap console-bridge
+            eigen3 yaml-cpp benchmark tinyxml2 assimp orocos-kdl pcl lapack-reference
+            cereal boost-dll boost-filesystem boost-program-options boost-graph
+            boost-stacktrace urdfdom ccd[double-precision] gtest catch2
+          triplet: x64-windows-release
+          extra-args: --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
+          token: ${{ github.token }}
+          cache-key: cellforge-vcpkg-windows-2022
+
+      # Put cl.exe / nmake.exe / ninja.exe on PATH
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -B build -G "Ninja" `
+            -DCMAKE_BUILD_TYPE=Release `
+            "-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows-release `
+            "-DVCPKG_OVERLAY_TRIPLETS=${{ github.workspace }}\cmake\triplets" `
+            -DVCPKG_MANIFEST_MODE=OFF
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build build --config Release
+
+      # Add tesseract and vcpkg DLL directories to PATH before running tests
+      - name: Test
+        shell: pwsh
+        run: |
+          $env:PATH = "${{ github.workspace }}\build\vendor_install\bin;" +
+                      "${{ github.workspace }}\vcpkg\installed\x64-windows-release\bin;" +
+                      $env:PATH
+          ctest --test-dir build/tests_build --output-on-failure -C Release

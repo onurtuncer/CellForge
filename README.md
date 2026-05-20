@@ -1,5 +1,7 @@
 # CellForge
 
+[![Windows](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml)
+
 A Windows-first robotics application built on [Tesseract Robotics](https://github.com/tesseract-robotics/tesseract) — an open-source motion planning and collision checking framework.
 
 ---
