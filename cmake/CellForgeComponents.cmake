@@ -14,8 +14,8 @@
 # the vendor headers exist.  For now, viewer only needs vcpkg packages
 # (Qt6, OpenCASCADE) which are available at configure time.
 
-option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library" ON)
-option(CELLFORGE_BUILD_VIEWER_EXAMPLES "Build viewer example app"      OFF)
+option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"   ON)
+option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application" OFF)
 
 if(CELLFORGE_BUILD_VIEWER)
   add_subdirectory(qt-viewer)

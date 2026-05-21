@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   QWidget* centralWidget = new QWidget(mainWindow);
   mainWindow->setCentralWidget(centralWidget);
   QHBoxLayout* hLayout = new QHBoxLayout(centralWidget);
-  hLayout->setMargin(6);
+  hLayout->setContentsMargins(6, 6, 6, 6);
 
   ViewerWidget* viewer = new ViewerWidget(centralWidget);
   hLayout->addWidget(viewer);
