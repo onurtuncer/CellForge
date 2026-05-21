@@ -29,6 +29,9 @@ add_library(viewer SHARED
     src/Viewer.cpp
     src/ViewerInteractor.cpp
     src/ViewerWidget.cpp
+    # List the Q_OBJECT header explicitly so AUTOMOC always finds and MOC-processes it,
+    # even though it lives in include/CellForge/ rather than next to the .cpp files.
+    include/CellForge/ViewerWidget.h
 )
 add_library(CellForge::viewer ALIAS viewer)
 set_target_properties(viewer PROPERTIES OUTPUT_NAME cellforge_viewer)
@@ -51,8 +54,12 @@ target_link_libraries(viewer
     PUBLIC
         Qt6::Widgets
     PRIVATE
-        TKernel TKMath TKService TKV3d TKAIS TKBRep TKOpenGl
-        $<$<PLATFORM_ID:Windows>:TKWNT>
+        TKernel     # Standard_Transient, Handle
+        TKMath      # gp_*, TColgp_*
+        TKService   # Aspect_*, Graphic3d_*, WNT_Window (Windows)
+        TKV3d       # V3d_Viewer, V3d_View, AIS_InteractiveContext, AIS_ViewController
+        TKBRep      # TopoDS_Shape
+        TKOpenGl    # OpenGL rendering driver
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────
