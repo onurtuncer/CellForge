@@ -31,6 +31,8 @@
       "features": ["double-precision"]
     },
     "gtest",
-    "catch2"
+    "catch2",
+    "opencascade",
+    "qtbase"
   ]
 }

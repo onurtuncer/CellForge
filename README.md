@@ -144,6 +144,8 @@ Key packages:
 | `yaml-cpp` | Configuration / SRDF parsing |
 | `boost-dll`, `boost-filesystem`, … | Plugin loader, file I/O |
 | `cereal` | Serialization |
+| `opencascade` | 3D geometry kernel (OCCT) — CAD/CAM primitives, BRep modelling |
+| `qtbase` | Qt 6 Core / GUI / Widgets — UI layer |
 | `gtest` | Unit testing |
 
 The custom triplet `cmake/triplets/x64-windows-release.cmake` builds all vcpkg packages as **dynamic-release** libraries, matching the Tesseract Windows CI configuration.
