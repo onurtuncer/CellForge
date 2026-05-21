@@ -9,7 +9,7 @@
 #   CELLFORGE_COMPILE_DEFINITIONS      — preprocessor definitions
 
 macro(cellforge_variables)
-  set(CELLFORGE_CXX_VERSION     17)
+  set(CELLFORGE_CXX_VERSION     20)
   set(CELLFORGE_COMPILE_DEFINITIONS "")
 
   if(MSVC)
