@@ -1,0 +1,31 @@
+#pragma once
+
+#include "Viewer.h"
+
+#include <QWidget>
+
+namespace CellForge {
+
+class ViewerWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  explicit ViewerWidget(QWidget* parent = nullptr);
+
+  QPaintEngine* paintEngine() const override { return nullptr; }
+
+protected:
+  void paintEvent(QPaintEvent*  theEvent) override;
+  void resizeEvent(QResizeEvent* theEvent) override;
+  void mouseReleaseEvent(QMouseEvent* theEvent) override;
+  void mouseDoubleClickEvent(QMouseEvent* event) override;
+
+private:
+  Viewer* m_viewer        = nullptr;
+  bool    m_isInitialized = false;
+  bool    m_startDrawing  = false;
+  QPoint  m_startP;
+};
+
+} // namespace CellForge
