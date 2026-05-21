@@ -1,8 +1,7 @@
 include(ExternalProject)
 
-set(VENDOR_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/vendor_install"
-    CACHE PATH "Staging install prefix for vendored packages")
-file(MAKE_DIRECTORY "${VENDOR_INSTALL_PREFIX}")
+# VENDOR_INSTALL_PREFIX is set by the root CMakeLists.txt before this file
+# is included.  It is not re-declared here to keep ownership unambiguous.
 
 # Arguments forwarded to every sub-build.
 # ExternalProject_Add inherits the generator/platform/toolset automatically;

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd"
+            schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>CellForge</name>
+  <version>0.1.0</version>
+  <description>CellForge robotics application — Qt6/OCCT visualisation and Tesseract motion planning</description>
+  <maintainer email="contact@cellforge.dev">CellForge</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ros_industrial_cmake_boilerplate</buildtool_depend>
+</package>

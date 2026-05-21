@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
 
-# ros_industrial_cmake_boilerplate must be installed before this package.
-# extract_package_metadata() reads package.xml to derive the project name/version.
 find_package(ros_industrial_cmake_boilerplate REQUIRED)
 extract_package_metadata(pkg)
 project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
@@ -9,6 +7,11 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
+
+# CellForge-wide compiler settings (CXX version, warning flags, definitions)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/cellforge_macros.cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/")
+cellforge_variables()
 
 # ─── Options ─────────────────────────────────────────────────────────────────
 option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application" OFF)
@@ -18,7 +21,6 @@ option(CELLFORGE_VIEWER_BUILD_TESTS    "Build viewer unit tests"          OFF)
 find_package(Qt6         REQUIRED COMPONENTS Widgets)
 find_package(OpenCASCADE REQUIRED)
 
-# CMake drives MOC/RCC automatically for all targets in this directory
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -31,15 +33,16 @@ add_library(viewer SHARED
 add_library(CellForge::viewer ALIAS viewer)
 set_target_properties(viewer PROPERTIES OUTPUT_NAME cellforge_viewer)
 
-target_compile_features(viewer PUBLIC cxx_std_17)
+target_cxx_version(viewer PUBLIC VERSION ${CELLFORGE_CXX_VERSION})
+target_compile_options(viewer PRIVATE ${CELLFORGE_COMPILE_OPTIONS_PRIVATE})
+target_compile_options(viewer PUBLIC  ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
+target_compile_definitions(viewer PUBLIC ${CELLFORGE_COMPILE_DEFINITIONS})
 
 target_include_directories(viewer
     PUBLIC
-        # Installed consumers: #include <CellForge/Viewer.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
-        # Internal .cpp files may use flat includes: #include "Viewer.h"
         ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge
         ${OpenCASCADE_INCLUDE_DIR}
 )
@@ -48,37 +51,56 @@ target_link_libraries(viewer
     PUBLIC
         Qt6::Widgets
     PRIVATE
-        TKernel         # Standard_Transient, Handle, TCollection_AsciiString
-        TKMath          # gp_*, TColgp_*
-        TKService       # Aspect_*, Graphic3d_*
-        TKV3d           # V3d_Viewer, V3d_View
-        TKAIS           # AIS_InteractiveContext, AIS_ViewController
-        TKBRep          # TopoDS_Shape
-        TKOpenGl        # OpenGL rendering driver
-        $<$<PLATFORM_ID:Windows>:TKWNT>   # WNT_Window — Windows only
+        TKernel TKMath TKService TKV3d TKAIS TKBRep TKOpenGl
+        $<$<PLATFORM_ID:Windows>:TKWNT>
 )
 
-# ─── Package export (tesseract / RICB scheme) ─────────────────────────────────
-# Installs:
-#   lib/cmake/cellforge_viewer/viewer-config.cmake
-#   lib/cmake/cellforge_viewer/viewer-targets.cmake
-# Consumers: find_package(cellforge_viewer REQUIRED COMPONENTS viewer)
-#            target_link_libraries(... CellForge::viewer)
-configure_component(
-    COMPONENT viewer
-    NAMESPACE CellForge
-    TARGETS   viewer
-    DEPENDENCIES
-        "Qt6 COMPONENTS Widgets"
-        OpenCASCADE
+# ─── Install & CMake package export ───────────────────────────────────────────
+# All CellForge component configs install to lib/cmake/CellForge/ so the root
+# umbrella configure_package() can include them via a single relative path.
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+install(TARGETS viewer
+    EXPORT   CellForge-viewer-targets
+    RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
+install(EXPORT CellForge-viewer-targets
+    NAMESPACE   CellForge::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+    FILE        viewer-targets.cmake
+)
+
+# Generate viewer-config.cmake that finds dependencies and imports targets
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in"
+"@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+find_dependency(Qt6 REQUIRED COMPONENTS Widgets)
+find_dependency(OpenCASCADE REQUIRED)
+if(NOT TARGET CellForge::viewer)
+  include(\"\${CMAKE_CURRENT_LIST_DIR}/viewer-targets.cmake\")
+endif()
+")
+configure_package_config_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
 )
 
 install(
     DIRECTORY   include/CellForge
-    DESTINATION include
-    COMPONENT   viewer
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     FILES_MATCHING PATTERN "*.h"
 )
+
+# Register with the root umbrella (propagates to root's SUPPORTED_COMPONENTS)
+set(SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS} "viewer" PARENT_SCOPE)
 
 # ─── Sub-directories ─────────────────────────────────────────────────────────
 if(CELLFORGE_VIEWER_BUILD_EXAMPLES)
