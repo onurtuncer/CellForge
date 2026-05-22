@@ -1,7 +1,7 @@
 {
   "name": "cellforge",
   "version": "0.1.0",
-  "builtin-baseline": "d09977e63111355bf0239592f47062b1ec3f767f",
+  "builtin-baseline": "8528134bac3d39db8d36f4097755a97a1394e4dc",
   "description": "CellForge robotics application (Tesseract-based)",
   "dependencies": [
     "eigen3",
@@ -33,6 +33,7 @@
     "gtest",
     "catch2",
     "opencascade",
-    "qtbase"
+    "qtbase",
+    "flecs"
   ]
 }
