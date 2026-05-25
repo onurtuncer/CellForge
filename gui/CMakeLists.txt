@@ -45,10 +45,9 @@ target_include_directories(viewer
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PUBLIC
         # OCCT headers are part of the public API (Viewer.h includes them),
         # so consumers must be able to find them too.
-        ${OpenCASCADE_INCLUDE_DIR}
+        $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge
 )

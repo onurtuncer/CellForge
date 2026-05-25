@@ -15,10 +15,10 @@ ViewerInteractor::ViewerInteractor(const Handle(V3d_View)&               view,
 
 ViewerInteractor::~ViewerInteractor() {}
 
-bool ViewerInteractor::UpdateMouseButtons(const Graphic3d_Vec2i& point,
-                                          Aspect_VKeyMouse       buttons,
-                                          Aspect_VKeyFlags       modifiers,
-                                          bool                   isEmulated)
+bool ViewerInteractor::UpdateMouseButtons(const NCollection_Vec2<int>& point,
+                                          Aspect_VKeyMouse             buttons,
+                                          Aspect_VKeyFlags             modifiers,
+                                          bool                         isEmulated)
 {
   return AIS_ViewController::UpdateMouseButtons(point, buttons, modifiers, isEmulated);
 }

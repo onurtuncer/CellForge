@@ -20,10 +20,10 @@ public:
 
   const Handle(AIS_InteractiveContext)& GetContext() const { return m_ctx; }
 
-  virtual bool UpdateMouseButtons(const Graphic3d_Vec2i& thePoint,
-                                  Aspect_VKeyMouse       theButtons,
-                                  Aspect_VKeyFlags       theModifiers,
-                                  bool                   theIsEmulated) Standard_OVERRIDE;
+  virtual bool UpdateMouseButtons(const NCollection_Vec2<int>& thePoint,
+                                  Aspect_VKeyMouse             theButtons,
+                                  Aspect_VKeyFlags             theModifiers,
+                                  bool                         theIsEmulated) Standard_OVERRIDE;
 
   virtual void KeyDown(Aspect_VKey theKey,
                        double      theTime,

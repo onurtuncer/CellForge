@@ -2,7 +2,7 @@
 #include "Components.h"
 #include "Tags.h"
 
-namespace cellforge::workcell {
+namespace CellForge::workcell {
 
 WorldRegistry::WorldRegistry() {
     register_components();
