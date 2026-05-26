@@ -18,21 +18,40 @@ set_target_properties(cellforge_viewer_example PROPERTIES
     OUTPUT_NAME           CellForgeViewerExample
 )
 
-# ─── Qt plugin deployment ─────────────────────────────────────────────────────
-# Place a qt.conf next to the exe so Qt finds its platform plugin (qwindows.dll)
-# without QT_PLUGIN_PATH being set in the environment.
-get_target_property(_qt6_dll Qt6::Core IMPORTED_LOCATION_RELEASE)
-get_filename_component(_qt6_bin "${_qt6_dll}" DIRECTORY)   # .../bin
-get_filename_component(_qt6_root "${_qt6_bin}" DIRECTORY)  # .../<prefix>
+# ─── Runtime deployment (Windows) ─────────────────────────────────────────────
+if(WIN32)
+    # Derive vcpkg bin dir from Qt6::Core (Qt, OCCT, spdlog, etc. all live here).
+    get_target_property(_qt6_dll Qt6::Core IMPORTED_LOCATION_RELEASE)
+    get_filename_component(_qt6_bin  "${_qt6_dll}" DIRECTORY)   # .../bin
+    get_filename_component(_qt6_root "${_qt6_bin}"  DIRECTORY)  # .../<prefix>
 
-file(GENERATE
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
-    CONTENT "[Paths]\nPlugins = ${_qt6_root}/Qt6/plugins\n"
-)
+    # qt.conf tells Qt where to find its platform plugin without QT_PLUGIN_PATH.
+    file(GENERATE
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
+        CONTENT "[Paths]\nPlugins = ${_qt6_root}/Qt6/plugins\n"
+    )
+    add_custom_command(TARGET cellforge_viewer_example POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
+            "$<TARGET_FILE_DIR:cellforge_viewer_example>/qt.conf"
+        COMMENT "Deploying qt.conf"
+    )
 
-add_custom_command(TARGET cellforge_viewer_example POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
-        "$<TARGET_FILE_DIR:cellforge_viewer_example>/qt.conf"
-    COMMENT "Deploying qt.conf alongside CellForgeViewerExample"
-)
+    # CellForge DLLs.
+    add_custom_command(TARGET cellforge_viewer_example POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:cellforge_core>"
+            "$<TARGET_FILE:viewer>"
+            "$<TARGET_FILE_DIR:cellforge_viewer_example>"
+        COMMENT "Deploying CellForge DLLs"
+    )
+
+    # All vcpkg DLLs (Qt6, OCCT, spdlog, yaml-cpp, flecs, TracyClient, …).
+    file(GLOB _vcpkg_bin_dlls "${_qt6_bin}/*.dll")
+    add_custom_command(TARGET cellforge_viewer_example POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${_vcpkg_bin_dlls}
+            "$<TARGET_FILE_DIR:cellforge_viewer_example>"
+        COMMENT "Deploying vcpkg runtime DLLs from ${_qt6_bin}"
+    )
+endif()

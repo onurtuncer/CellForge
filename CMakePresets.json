@@ -2,71 +2,95 @@
   "version": 6,
   "configurePresets": [
     {
+      "name": "base",
+      "hidden": true,
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-release",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets",
+        "CELLFORGE_BUILD_CORE":                     "ON",
+        "CELLFORGE_BUILD_WORKCELL":                 "ON",
+        "CELLFORGE_BUILD_VIEWER":                   "ON",
+        "CELLFORGE_BUILD_PLATFORM_QT":              "ON",
+        "CELLFORGE_VIEWER_BUILD_EXAMPLES":          "ON",
+        "CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES":     "ON",
+        "CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES":    "ON"
+      }
+    },
+    {
+      "name": "windows-vs2026-x64-release",
+      "displayName": "Windows VS 2026 x64 Release",
+      "description": "MSVC 2026 (v18), x64, Release — vcpkg via VCPKG_ROOT env var",
+      "inherits": "base",
+      "generator": "Visual Studio 18 2026",
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      },
+      "binaryDir": "${sourceDir}/build/vs2026-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "windows-vs2022-x64-release",
       "displayName": "Windows VS 2022 x64 Release",
-      "description": "MSVC 2022, x64, Release — vcpkg via VCPKG_ROOT env var",
+      "description": "MSVC 2022 (v17), x64, Release — vcpkg via VCPKG_ROOT env var",
+      "inherits": "base",
       "generator": "Visual Studio 17 2022",
       "architecture": {
         "value": "x64",
         "strategy": "set"
       },
       "binaryDir": "${sourceDir}/build/vs2022-release",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-release",
-        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets"
-      }
-    },
-    {
-      "name": "windows-nmake-x64-release",
-      "displayName": "Windows NMake x64 Release",
-      "description": "NMake + MSVC — run from a Developer Command Prompt or after vcvarsall.bat x64",
-      "generator": "NMake Makefiles",
-      "binaryDir": "${sourceDir}/build/nmake-release",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-release",
-        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
       "name": "windows-ninja-x64-release",
       "displayName": "Windows Ninja x64 Release",
       "description": "Ninja + MSVC (run from Developer PowerShell), Release",
+      "inherits": "base",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/ninja-release",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-release",
-        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
       "name": "windows-ninja-x64-debug",
       "displayName": "Windows Ninja x64 Debug",
       "description": "Ninja + MSVC (run from Developer PowerShell), Debug — uses Release vcpkg deps",
+      "inherits": "base",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/ninja-debug",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-release",
-        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets"
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-nmake-x64-release",
+      "displayName": "Windows NMake x64 Release",
+      "description": "NMake + MSVC — run from a Developer Command Prompt or after vcvarsall.bat x64",
+      "inherits": "base",
+      "generator": "NMake Makefiles",
+      "binaryDir": "${sourceDir}/build/nmake-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "windows-vs2022-x64-release",
-      "configurePreset": "windows-vs2022-x64-release",
+      "name": "windows-vs2026-x64-release",
+      "configurePreset": "windows-vs2026-x64-release",
       "configuration": "Release"
     },
     {
-      "name": "windows-nmake-x64-release",
-      "configurePreset": "windows-nmake-x64-release"
+      "name": "windows-vs2022-x64-release",
+      "configurePreset": "windows-vs2022-x64-release",
+      "configuration": "Release"
     },
     {
       "name": "windows-ninja-x64-release",
@@ -75,6 +99,10 @@
     {
       "name": "windows-ninja-x64-debug",
       "configurePreset": "windows-ninja-x64-debug"
+    },
+    {
+      "name": "windows-nmake-x64-release",
+      "configurePreset": "windows-nmake-x64-release"
     }
   ]
 }

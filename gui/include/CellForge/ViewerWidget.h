@@ -25,10 +25,10 @@ public:
   QPaintEngine* paintEngine() const override { return nullptr; }
 
 protected:
-  void PaintEvent(QPaintEvent*  theEvent) override;
-  void ResizeEvent(QResizeEvent* theEvent) override;
-  void MouseReleaseEvent(QMouseEvent* theEvent) override;
-  void MouseDoubleClickEvent(QMouseEvent* event) override;
+  void paintEvent(QPaintEvent*  theEvent) override;
+  void resizeEvent(QResizeEvent* theEvent) override;
+  void mouseReleaseEvent(QMouseEvent* theEvent) override;
+  void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
   Viewer* m_viewer        = nullptr;
