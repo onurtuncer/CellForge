@@ -1,4 +1,11 @@
-
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
 
 #pragma once
 
@@ -12,7 +19,7 @@ enum class KeyCode : uint16_t {
 
 
 Space = 32,
-Apostrophe = 
+Apostrophe = 39, /* ' */
 Comma = 44, /* , */
 Minus = 45, /* - */
 Period = 46, /* . */

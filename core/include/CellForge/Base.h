@@ -1,9 +1,30 @@
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
+
 #pragma once
 
 #include "Ref.h"
 
 #include <functional>
 #include  <memory>
+
+// DLL export/import for static data members (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
+// covers functions but not static class data — those need explicit decoration).
+#if defined(CF_PLATFORM_WINDOWS)
+  #if defined(cellforge_core_EXPORTS)
+    #define CF_API __declspec(dllexport)
+  #else
+    #define CF_API __declspec(dllimport)
+  #endif
+#else
+  #define CF_API __attribute__((visibility("default")))
+#endif
 
 namespace CellForge {
 

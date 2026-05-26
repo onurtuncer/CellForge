@@ -1,10 +1,19 @@
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
+
 #pragma once
 
-#include "CellForge/Core/Base.h"
-#include "CellForge/Core/LogCustomFormatters.h"
+#include "CellForge/Base.h"
 
 #include <spdlog/spdlog.h>
 
+#include <format>
 #include <map>
 #include <memory>
 #include <string>
@@ -21,7 +30,7 @@
 
 namespace CellForge {
 
-	class Log
+	class CF_API Log
 	{
 	public:
 		enum class Type : uint8_t
@@ -44,19 +53,13 @@ namespace CellForge {
 
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
-		inline static std::shared_ptr<spdlog::logger>& GetEditorConsoleLogger() { return s_EditorConsoleLogger; }
 
 		static bool HasTag(const std::string& tag) { return s_EnabledTags.find(tag) != s_EnabledTags.end(); }
 		static std::map<std::string, TagDetails>& EnabledTags() { return s_EnabledTags; }
 		static void SetDefaultTagSettings();
 
-#if defined(CF_PLATFORM_WINDOWS)
 		template<typename... Args>
 		static void PrintMessage(Log::Type type, Log::Level level, std::format_string<Args...> format, Args&&... args);
-#else
-		template<typename... Args>
-		static void PrintMessage(Log::Type type, Log::Level level, const std::string_view format, Args&&... args);
-#endif
 
 		template<typename... Args>
 		static void PrintMessageTag(Log::Type type, Log::Level level, std::string_view tag, std::format_string<Args...> format, Args&&... args);
@@ -96,7 +99,7 @@ namespace CellForge {
 	private:
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-	
+
 		inline static std::map<std::string, TagDetails> s_EnabledTags;
 		static std::map<std::string, TagDetails> s_DefaultTagDetails;
 	};
@@ -137,44 +140,26 @@ namespace CellForge {
 #define CF_ERROR(...)   ::CellForge::Log::PrintMessage(::CellForge::Log::Type::Client, ::CellForge::Log::Level::Error, __VA_ARGS__)
 #define CF_FATAL(...)   ::CellForge::Log::PrintMessage(::CellForge::Log::Type::Client, ::CellForge::Log::Level::Fatal, __VA_ARGS__)
 
-// Editor Console Logging Macros
-#define CF_CONSOLE_LOG_TRACE(...)   CellForge::Log::GetEditorConsoleLogger()->trace(__VA_ARGS__)
-#define CF_CONSOLE_LOG_INFO(...)    CellForge::Log::GetEditorConsoleLogger()->info(__VA_ARGS__)
-#define CF_CONSOLE_LOG_WARN(...)    CellForge::Log::GetEditorConsoleLogger()->warn(__VA_ARGS__)
-#define CF_CONSOLE_LOG_ERROR(...)   CellForge::Log::GetEditorConsoleLogger()->error(__VA_ARGS__)
-#define CF_CONSOLE_LOG_FATAL(...)   CellForge::Log::GetEditorConsoleLogger()->critical(__VA_ARGS__)
 
 namespace CellForge {
 
-#if defined(CF_PLATFORM_WINDOWS)
 	template<typename... Args>
 	void Log::PrintMessage(Log::Type type, Log::Level level, std::format_string<Args...> format, Args&&... args)
-#else
-	template<typename... Args>
-	void Log::PrintMessage(Log::Type type, Log::Level level, const std::string_view format, Args&&... args)
-#endif
 	{
 		auto detail = s_EnabledTags[""];
 		if (detail.Enabled && detail.LevelFilter <= level)
 		{
+			// Pre-format with std::format so spdlog receives a plain string —
+			// avoids the fmt::format_string / std::format_string type mismatch.
+			std::string msg = std::format(format, std::forward<Args>(args)...);
 			auto logger = (type == Type::Core) ? GetCoreLogger() : GetClientLogger();
 			switch (level)
 			{
-			case Level::Trace:
-				logger->trace(format, std::forward<Args>(args)...);
-				break;
-			case Level::Info:
-				logger->info(format, std::forward<Args>(args)...);
-				break;
-			case Level::Warn:
-				logger->warn(format, std::forward<Args>(args)...);
-				break;
-			case Level::Error:
-				logger->error(format, std::forward<Args>(args)...);
-				break;
-			case Level::Fatal:
-				logger->critical(format, std::forward<Args>(args)...);
-				break;
+				case Level::Trace:   logger->trace("{}", msg);    break;
+				case Level::Info:    logger->info("{}", msg);     break;
+				case Level::Warn:    logger->warn("{}", msg);     break;
+				case Level::Error:   logger->error("{}", msg);    break;
+				case Level::Fatal:   logger->critical("{}", msg); break;
 			}
 		}
 	}

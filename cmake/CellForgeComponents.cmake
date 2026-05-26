@@ -14,14 +14,25 @@
 # the vendor headers exist.  For now, viewer only needs vcpkg packages
 # (Qt6, OpenCASCADE) which are available at configure time.
 
-option(CELLFORGE_BUILD_WORKCELL        "Build flecs ECS workcell library" ON)
-option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"    ON)
-option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"  OFF)
+option(CELLFORGE_BUILD_CORE            "Build core platform-agnostic library" ON)
+option(CELLFORGE_BUILD_WORKCELL        "Build flecs ECS workcell library"     ON)
+option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"        ON)
+option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"     OFF)
+option(CELLFORGE_BUILD_PLATFORM_QT     "Build Qt platform backend"            ON)
+
+if(CELLFORGE_BUILD_CORE)
+  add_subdirectory(core)
+endif()
 
 if(CELLFORGE_BUILD_WORKCELL)
   add_subdirectory(workcell)
 endif()
 
 if(CELLFORGE_BUILD_VIEWER)
-  add_subdirectory(qt-viewer)
+  add_subdirectory(gui)
+endif()
+
+# platform must come after core (depends on CellForge::core target)
+if(CELLFORGE_BUILD_PLATFORM_QT)
+  add_subdirectory(platform)
 endif()

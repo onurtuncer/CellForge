@@ -1,6 +1,15 @@
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
+
 #pragma once
 
-#include "Base.h"
+#include "CellForge/Base.h"
 
 namespace CellForge {
 
@@ -40,9 +49,9 @@ namespace CellForge {
 namespace std {
 
 	template <>
-	struct hash<Hazel::UUID>
+	struct hash<CellForge::UUID>
 	{
-		std::size_t operator()(const Hazel::UUID& uuid) const
+		std::size_t operator()(const CellForge::UUID& uuid) const
 		{
 			// uuid is already a randomly generated number, and is suitable as a hash key as-is.
 			// this may change in future, in which case return hash<uint64_t>{}(uuid); might be more appropriate
@@ -51,9 +60,9 @@ namespace std {
 	};
 
 	template <>
-	struct hash<Hazel::UUID32>
+	struct hash<CellForge::UUID32>
 	{
-		std::size_t operator()(const Hazel::UUID32& uuid) const
+		std::size_t operator()(const CellForge::UUID32& uuid) const
 		{
 			return hash<uint32_t>()((uint32_t)uuid);
 		}

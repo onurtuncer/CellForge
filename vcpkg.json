@@ -32,6 +32,8 @@
     },
     "gtest",
     "catch2",
+    "spdlog",
+    "tracy",
     "opencascade",
     "qtbase",
     "flecs"

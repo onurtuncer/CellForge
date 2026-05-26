@@ -1,10 +1,18 @@
-
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
 
 #pragma once
 
 #define CF_ENABLE_PROFILING !CF_DIST
 
-#if CF_ENABLE_PROFILING 
+#if CF_ENABLE_PROFILING
+#include <cassert>  // tracy headers require assert() to be in scope
 #include <tracy/Tracy.hpp>
 #endif
 

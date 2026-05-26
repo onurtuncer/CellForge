@@ -1,8 +1,15 @@
-
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
 
 #pragma once
 
-#ifdef HZ_PLATFORM_WINDOWS
+#ifdef CF_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 
@@ -29,11 +36,9 @@
 #include <filesystem>
 #include <thread>
 
-#include <Hazel/Core/Version.h>
-#include <Hazel/Core/Assert.h>
-#include <Hazel/Core/Base.h>
-#include <Hazel/Core/Events/Event.h>
-#include <Hazel/Core/Log.h>
-#include <Hazel/Core/Math/Mat4.h>
-#include <Hazel/Core/Memory.h>
-#include <Hazel/Core/Delegate.h>
+#include <CellForge/Version.h>
+#include <CellForge/Assert.h>
+#include <CellForge/Base.h>
+#include <CellForge/Event/Event.h>
+#include <CellForge/Log.h>
+#include <CellForge/Memory.h>

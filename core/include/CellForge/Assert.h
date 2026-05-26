@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
 
 #pragma once
 
@@ -20,11 +28,11 @@
 
 #ifdef CF_ENABLE_ASSERTS
 	#ifdef CF_COMPILER_CLANG
-		#define CF_CORE_ASSERT_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Core, "Assertion Failed", ##__VA_ARGS__)
-		#define CF_ASSERT_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Client, "Assertion Failed", ##__VA_ARGS__)
+		#define CF_CORE_ASSERT_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Core, "Assertion Failed", ##__VA_ARGS__)
+		#define CF_ASSERT_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Client, "Assertion Failed", ##__VA_ARGS__)
 	#else
-		#define CF_CORE_ASSERT_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Core, "Assertion Failed" __VA_OPT__(,) __VA_ARGS__)
-		#define CF_ASSERT_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Client, "Assertion Failed" __VA_OPT__(,) __VA_ARGS__)
+		#define CF_CORE_ASSERT_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Core, "Assertion Failed" __VA_OPT__(,) __VA_ARGS__)
+		#define CF_ASSERT_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Client, "Assertion Failed" __VA_OPT__(,) __VA_ARGS__)
 	#endif
 
 	#define CF_CORE_ASSERT(condition, ...) { if(!(condition)) { CF_CORE_ASSERT_MESSAGE_INTERNAL(__VA_ARGS__); CF_DEBUG_BREAK; } }
@@ -36,11 +44,11 @@
 
 #ifdef CF_ENABLE_VERIFY
 	#ifdef CF_COMPILER_CLANG
-		#define CF_CORE_VERIFY_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Core, "Verify Failed", ##__VA_ARGS__)
-		#define CF_VERIFY_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Client, "Verify Failed", ##__VA_ARGS__)
+		#define CF_CORE_VERIFY_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Core, "Verify Failed", ##__VA_ARGS__)
+		#define CF_VERIFY_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Client, "Verify Failed", ##__VA_ARGS__)
 	#else
-		#define CF_CORE_VERIFY_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Core, "Verify Failed" __VA_OPT__(,) __VA_ARGS__)
-		#define CF_VERIFY_MESSAGE_INTERNAL(...)  ::Hazel::Log::PrintAssertMessage(::Hazel::Log::Type::Client, "Verify Failed" __VA_OPT__(,) __VA_ARGS__)
+		#define CF_CORE_VERIFY_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Core, "Verify Failed" __VA_OPT__(,) __VA_ARGS__)
+		#define CF_VERIFY_MESSAGE_INTERNAL(...)  ::CellForge::Log::PrintAssertMessage(::CellForge::Log::Type::Client, "Verify Failed" __VA_OPT__(,) __VA_ARGS__)
 	#endif
 
 	#define CF_CORE_VERIFY(condition, ...) { if(!(condition)) { CF_CORE_VERIFY_MESSAGE_INTERNAL(__VA_ARGS__); CF_DEBUG_BREAK; } }

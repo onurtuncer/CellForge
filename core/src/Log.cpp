@@ -1,10 +1,17 @@
+﻿// ------------------------------------------------------------------------------------
+// Project: CellForge
+// Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+// Author: Onur Tuncer, PhD
+//
+// SPDX-License-Identifier: LGPL-2.1-only
+// License-Filename: LICENSE
+// ------------------------------------------------------------------------------------
 
+#include "CellForge/PreCompiledHeader.h"
+#include "CellForge/Log.h"
 
-#include "PrecompiledHeader.h"
-#include "Log.h"
-
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/basic_file_sink.h"
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include <filesystem>
 
@@ -14,7 +21,6 @@ namespace CellForge {
 
 	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
 	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
-	std::shared_ptr<spdlog::logger> Log::s_EditorConsoleLogger;
 
 	std::map<std::string, Log::TagDetails> Log::s_DefaultTagDetails = {
 		{ "Animation",         TagDetails{  true, Level::Warn  } },
@@ -49,22 +55,12 @@ namespace CellForge {
 #endif
 		};
 
-		std::vector<spdlog::sink_ptr> editorConsoleSinks =
-		{
-			std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/APP.log", true),
-#if CF_HAS_CONSOLE
-			std::make_shared<spdlog::sinks::stdout_color_sink_mt>()
-#endif
-		};
-
 		cellForgeSinks[0]->set_pattern("[%T] [%l] %n: %v");
 		appSinks[0]->set_pattern("[%T] [%l] %n: %v");
 
 #if CF_HAS_CONSOLE
 		cellForgeSinks[1]->set_pattern("%^[%T] %n: %v%$");
 		appSinks[1]->set_pattern("%^[%T] %n: %v%$");
-		for (auto sink : editorConsoleSinks)
-			sink->set_pattern("%^%v%$");
 #endif
 
 		s_CoreLogger = std::make_shared<spdlog::logger>("cellForge", cellForgeSinks.begin(), cellForgeSinks.end());
