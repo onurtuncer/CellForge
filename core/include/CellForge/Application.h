@@ -26,7 +26,7 @@ namespace CellForge {
         std::string Name = "CellForge App";
     };
 
-    class Application {
+    class CF_API Application {
         using EventCallbackFn = std::function<void(Event&)>;
     public:
         explicit Application(const ApplicationSpecification& spec = {},

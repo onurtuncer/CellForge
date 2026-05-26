@@ -12,6 +12,7 @@ target_compile_definitions(example_mfc_event_log PRIVATE
     _AFXDLL
     UNICODE
     _UNICODE
+    WIN32_LEAN_AND_MEAN
 )
 
 # VS project must be set to "Use MFC in a Shared DLL" or the linker won't find
