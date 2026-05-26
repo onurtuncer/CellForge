@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 // Project: CellForge
 // Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
 // Author: Onur Tuncer, PhD
@@ -9,33 +9,22 @@
 
 #pragma once
 
-namespace CellForge{
+namespace CellForge {
 
-    class IApplicationPlatform
-    {
-    public:
-        virtual ~IApplicationPlatform() = default;
+// Platform back-end integration point for Application::Run().
+// Each method has a default no-op so back-ends only override what they need.
+//
+// Lifetime contract (called by Application::Run()):
+//   init()        — once, before OnInit()
+//   pollEvents()  — every tick, before ProcessEvents() / OnUpdate()
+//   shutdown()    — once, after OnShutdown()
+class IApplicationPlatform {
+public:
+    virtual ~IApplicationPlatform() = default;
 
-        virtual void Initialize(int argc, char** argv) = 0;
-        virtual int Run() = 0;
-        virtual void Shutdown() = 0;
+    virtual void init()       {}
+    virtual void pollEvents() {}
+    virtual void shutdown()   {}
+};
 
-        virtual std::shared_ptr<IWindow> CreateMainWindow(
-            const std::string& title,
-            int width,
-            int height) = 0;
-
-        virtual std::shared_ptr<IViewportWidget> CreateViewportWidget() = 0;
-
-        virtual std::shared_ptr<IMenuBar> CreateMenuBar(
-            std::shared_ptr<IWindow> window) = 0;
-
-        virtual std::shared_ptr<IDockingSystem> CreateDockingSystem(
-            std::shared_ptr<IWindow> window) = 0;
-    };
-} 
-
-
-
-}
-
+} // namespace CellForge

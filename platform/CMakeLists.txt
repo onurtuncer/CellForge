@@ -19,6 +19,7 @@ set(CMAKE_AUTOMOC ON)
 # ─── Library ─────────────────────────────────────────────────────────────────
 add_library(cellforge_platform_qt SHARED
     src/ViewPortWidget.cpp
+    src/QtApplicationPlatform.cpp
     # Listed explicitly so AUTOMOC processes Q_OBJECT in the include tree.
     include/CellForge/qt/widgets/ViewPortWidget.h
 )

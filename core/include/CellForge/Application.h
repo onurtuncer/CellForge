@@ -11,8 +11,10 @@
 
 #include "CellForge/Base.h"
 #include "CellForge/Event/Event.h"
+#include "CellForge/IApplicationPlatform.h"
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -27,7 +29,8 @@ namespace CellForge {
     class Application {
         using EventCallbackFn = std::function<void(Event&)>;
     public:
-        explicit Application(const ApplicationSpecification& spec = {});
+        explicit Application(const ApplicationSpecification& spec = {},
+                             Scope<IApplicationPlatform> platform = nullptr);
         virtual ~Application();
 
         void Run();
@@ -56,12 +59,13 @@ namespace CellForge {
         void ProcessEvents();
 
     private:
-        ApplicationSpecification m_Specification;
-        bool m_Running = true;
+        ApplicationSpecification       m_Specification;
+        Scope<IApplicationPlatform>    m_Platform;
+        bool                           m_Running = true;
 
-        std::mutex m_EventQueueMutex;
-        std::deque<std::function<void()>> m_EventQueue;
-        std::vector<EventCallbackFn> m_EventCallbacks;
+        std::mutex                            m_EventQueueMutex;
+        std::deque<std::function<void()>>     m_EventQueue;
+        std::vector<EventCallbackFn>          m_EventCallbacks;
 
         static Application* s_Instance;
     };

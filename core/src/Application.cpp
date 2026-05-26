@@ -15,8 +15,10 @@ namespace CellForge {
 
     Application* Application::s_Instance = nullptr;
 
-    Application::Application(const ApplicationSpecification& spec)
+    Application::Application(const ApplicationSpecification& spec,
+                             Scope<IApplicationPlatform> platform)
         : m_Specification(spec)
+        , m_Platform(std::move(platform))
     {
         CF_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
@@ -33,13 +35,16 @@ namespace CellForge {
 
     void Application::Run()
     {
+        if (m_Platform) m_Platform->init();
         OnInit();
         while (m_Running)
         {
+            if (m_Platform) m_Platform->pollEvents();
             ProcessEvents();
             OnUpdate();
         }
         OnShutdown();
+        if (m_Platform) m_Platform->shutdown();
     }
 
     void Application::Close()
