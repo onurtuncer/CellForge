@@ -2,7 +2,79 @@
 
 [![Windows](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml)
 
-A Windows-first robotics application built on [Tesseract Robotics](https://github.com/tesseract-robotics/tesseract) — an open-source motion planning and collision checking framework.
+A Windows-first C++ application framework for industrial robotics and automation.  
+CellForge provides a platform-agnostic core with typed events, an ECS-based workcell model, and pluggable platform backends — currently Qt 6 and Win32/MFC — that each drive `Application::Run()` without coupling the core to any GUI toolkit.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Application                          │
+│  Run() → platform->init()                                   │
+│          OnInit()                                           │
+│          loop { platform->pollEvents()                      │
+│                 ProcessEvents()   ← CellForge event queue   │
+│                 OnUpdate() }                                │
+│          OnShutdown()                                       │
+│          platform->shutdown()                               │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ IApplicationPlatform
+          ┌────────────┴────────────┐
+          │                         │
+ QtApplicationPlatform     MfcApplicationPlatform
+ QCoreApplication::         PeekMessage /
+ processEvents()            TranslateMessage /
+                            DispatchMessage
+```
+
+### Components
+
+| Directory | CMake target | Description |
+|---|---|---|
+| `core/` | `CellForge::core` | Application lifecycle, typed event system, ECS (flecs), logging (spdlog), Tracy profiling, memory tracking |
+| `workcell/` | `CellForge::workcell` | ECS-based robot cell model — entities, components, scene loading/querying (flecs + OpenCASCADE) |
+| `gui/` | `CellForge::viewer` | Interactive 3D viewer widget (Qt 6 + OpenCASCADE OCCT) |
+| `platform/` | `CellForge::platform_qt` | Qt 6 platform backend — `QtApplicationPlatform`, `ViewportWidget`, key/mouse event mapper |
+| `platform/` | `CellForge::platform_mfc` | Win32 / MFC platform backend — `MfcApplicationPlatform`, `MfcViewportWnd`, VK key mapper *(requires VS MFC component)* |
+| `vendor/` | — | Source-built dependencies: Tesseract, opw_kinematics, boost_plugin_loader, RICB |
+
+### Event system
+
+CellForge uses a typed, dispatcher-based event system that is entirely independent of Qt signals/slots or Win32 message maps:
+
+```cpp
+// Platform widgets translate native events and push them into CellForge:
+viewport->setEventCallback([this](Event& e) { OnEvent(e); });
+
+// Application subclass handles them via EventDispatcher:
+EventDispatcher d(event);
+d.dispatch<KeyPressedEvent>([](KeyPressedEvent& e) {
+    CF_CORE_INFO("key {}", static_cast<int>(e.keyCode()));
+    return false;
+});
+```
+
+All platform backends translate their native events (Qt `QKeyEvent`, Win32 `WM_KEYDOWN`, …) into the same `CellForge::Event` hierarchy, so application code is identical regardless of the backend in use.
+
+### Platform backends
+
+Both backends implement three hooks that `Application::Run()` calls at fixed points:
+
+```cpp
+class IApplicationPlatform {
+public:
+    virtual void init()       {}   // called once before OnInit()
+    virtual void pollEvents() {}   // called every tick (non-blocking pump)
+    virtual void shutdown()   {}   // called once after OnShutdown()
+};
+```
+
+| Backend | `init()` | `pollEvents()` | `shutdown()` |
+|---|---|---|---|
+| Qt | creates `QApplication`, sets `quitOnLastWindowClosed(false)` | `processEvents(AllEvents, 16 ms)` | drains queue, destroys `QApplication` |
+| MFC | creates `CWinApp`, calls `AfxWinInit` + `InitApplication` | `PeekMessage` drain loop, 16 ms sleep when idle | drain remaining messages, destroys `CWinApp` |
 
 ---
 
@@ -12,24 +84,42 @@ A Windows-first robotics application built on [Tesseract Robotics](https://githu
 CellForge/
 ├── CMakeLists.txt              # Top-level superbuild
 ├── CMakePresets.json           # Ready-to-use configure/build presets
-├── vcpkg.json                  # vcpkg dependency manifest
 ├── cmake/
+│   ├── CellForgeComponents.cmake   # Per-component build options
+│   ├── VendorDependencies.cmake    # ExternalProject rules for vendor/
+│   ├── cellforge_macros.cmake      # Shared CMake helpers
 │   └── triplets/
-│       └── x64-windows-release.cmake   # Custom vcpkg triplet (dynamic, release)
-└── vendor/                     # Source-built dependencies (git submodules)
-    ├── ros_industrial_cmake_boilerplate/   # CMake utility macros (required by all others)
-    ├── opw_kinematics/                     # Header-only analytical IK solver
-    ├── boost_plugin_loader/                # Boost-based plugin loading utilities
-    └── tesseract/                          # Core robotics framework
-        ├── common/             # Shared utilities and types
-        ├── geometry/           # Geometric primitives
-        ├── scene_graph/        # Robot scene representation
-        ├── state_solver/       # Joint state solving
-        ├── collision/          # Collision checking (Bullet, FCL)
-        ├── srdf/               # Semantic robot description format
-        ├── urdf/               # URDF parser
-        ├── kinematics/         # Kinematic solvers (OPW, KDL, …)
-        └── environment/        # Planning environment
+│       └── x64-windows-release.cmake  # vcpkg triplet (dynamic, release only)
+├── core/                       # CellForge::core — platform-agnostic
+│   ├── include/CellForge/
+│   │   ├── Application.h / .cpp
+│   │   ├── IApplicationPlatform.h
+│   │   ├── EntryPoint.h
+│   │   ├── Event/              # Event, EventDispatcher, EventQueue, typed events
+│   │   ├── Input/              # KeyCodes, MouseButton
+│   │   ├── ecs/                # UUID, Entity, World, Relationship
+│   │   ├── Log.h               # spdlog wrapper (CF_CORE_INFO / CF_INFO / …)
+│   │   └── Debug/Profiler.h    # Tracy integration macros
+│   └── src/
+├── workcell/                   # CellForge::workcell — ECS robot cell
+├── gui/                        # CellForge::viewer — Qt6 + OCCT 3D viewer
+├── platform/                   # Platform backends
+│   ├── include/CellForge/
+│   │   ├── qt/                 # Qt headers (ViewportWidget, QtApplicationPlatform, QtEventMapper)
+│   │   └── mfc/                # MFC headers (MfcViewportWnd, MfcApplicationPlatform, MfcKeyMapper)
+│   ├── src/
+│   │   ├── qt/                 # Qt sources
+│   │   └── mfc/                # MFC sources
+│   ├── mfc/CMakeLists.txt      # Isolated subdir — sets CMAKE_MFC_FLAG=2
+│   └── examples/
+│       ├── qt/                 # Qt event log demo (example_event_log)
+│       └── mfc/                # MFC event log demo (example_mfc_event_log)
+├── tests/
+└── vendor/                     # Git submodules
+    ├── ros_industrial_cmake_boilerplate/
+    ├── opw_kinematics/
+    ├── boost_plugin_loader/
+    └── tesseract/
 ```
 
 ---
@@ -39,12 +129,13 @@ CellForge/
 | Requirement | Version | Notes |
 |---|---|---|
 | Windows | 10 / 11 x64 | |
-| MSVC | 2019 (v142) or 2022 (v143) | C++ workload required |
-| CMake | ≥ 3.18 | [cmake.org](https://cmake.org/download/) |
-| Ninja | any | Optional — needed for the Ninja presets |
-| vcpkg | latest | See setup below |
+| Visual Studio | 2022 (v143) or 2026 (v180) | **Desktop development with C++** workload |
+| CMake | ≥ 3.18 | |
+| vcpkg | latest | installed at `C:\vcpkg` (classic mode) |
+| Qt 6 | 6.x | via vcpkg |
+| MFC | — | *Optional* — "C++ MFC for latest build tools" VS Installer component, required only for `platform_mfc` |
 
-### Install vcpkg
+### Install vcpkg (classic mode)
 
 ```powershell
 git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
@@ -52,16 +143,24 @@ C:\vcpkg\bootstrap-vcpkg.bat
 [System.Environment]::SetEnvironmentVariable("VCPKG_ROOT", "C:\vcpkg", "User")
 ```
 
-Restart your shell so `VCPKG_ROOT` is visible to CMake.
+> **Note:** CellForge uses vcpkg in **classic mode** — packages are installed to `C:\vcpkg\installed\`, not into the project directory. Do not use `vcpkg integrate install` or manifest mode.
 
-### Clone this repository
+Install the required packages:
+
+```powershell
+vcpkg install spdlog flecs tracy qt6-base opencascade yaml-cpp `
+              eigen3 bullet3 fcl assimp boost-dll gtest `
+              --triplet x64-windows-release --classic
+```
+
+### Clone
 
 ```powershell
 git clone --recurse-submodules https://github.com/onurtuncer/CellForge.git
 cd CellForge
 ```
 
-If you already cloned without `--recurse-submodules`:
+If you already cloned without submodules:
 
 ```powershell
 git submodule update --init --recursive
@@ -71,115 +170,126 @@ git submodule update --init --recursive
 
 ## Build
 
-The build has two stages that happen automatically in sequence:
+On first configure CMake automatically bootstraps `ros_industrial_cmake_boilerplate` from `vendor/` — this takes a few extra seconds once only.
 
-1. **vcpkg** installs all binary dependencies declared in `vcpkg.json` (Eigen, Bullet3, FCL, Boost, YAML-cpp, Assimp, PCL, …).
-2. **CMake superbuild** compiles and stages the vendored source packages in dependency order:
-
-   ```
-   ros_industrial_cmake_boilerplate
-           ↓              ↓
-     opw_kinematics   boost_plugin_loader
-           ↓              ↓
-              tesseract
-   ```
-
-   All vendor packages install into `<build_dir>/vendor_install/`.
-
-### Option A — Visual Studio 2022 (recommended)
+### Visual Studio (recommended)
 
 ```powershell
 cmake --preset windows-vs2022-x64-release
 cmake --build --preset windows-vs2022-x64-release
 ```
 
-Opens / builds a full VS solution. The preset handles generator selection and vcpkg toolchain automatically.
+### Ninja (faster incremental builds)
 
-### Option B — Ninja (faster incremental builds)
-
-Run from a **Developer PowerShell for VS** so the MSVC compiler is on `PATH`:
+Run from a **Developer PowerShell for VS** so MSVC is on `PATH`:
 
 ```powershell
 cmake --preset windows-ninja-x64-release
 cmake --build --preset windows-ninja-x64-release
 ```
 
-A Debug variant is also available:
+Debug variant:
 
 ```powershell
 cmake --preset windows-ninja-x64-debug
 cmake --build --preset windows-ninja-x64-debug
 ```
 
-### Option C — Manual configure (no presets)
+### Component options
 
-```powershell
-cmake -B build -G "Visual Studio 17 2022" -A x64 `
-      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
-      -DVCPKG_TARGET_TRIPLET=x64-windows-release `
-      -DVCPKG_OVERLAY_TRIPLETS="cmake/triplets" `
-      -DCMAKE_BUILD_TYPE=Release
+| CMake option | Default | Description |
+|---|---|---|
+| `CELLFORGE_BUILD_CORE` | `ON` | Core library |
+| `CELLFORGE_BUILD_WORKCELL` | `ON` | ECS workcell library |
+| `CELLFORGE_BUILD_VIEWER` | `ON` | Qt6 + OCCT viewer library |
+| `CELLFORGE_BUILD_PLATFORM_QT` | `ON` | Qt platform backend |
+| `CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES` | `OFF` | Qt event log example |
+| `CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES` | `OFF` | MFC event log example |
 
-cmake --build build --config Release
+---
+
+## Writing an application
+
+Subclass `Application`, pass an `IApplicationPlatform` to the constructor, and implement `CreateApplication`:
+
+```cpp
+#include <CellForge/Application.h>
+#include <CellForge/EntryPoint.h>
+#include <CellForge/qt/QtApplicationPlatform.h>
+#include <CellForge/qt/widgets/ViewPortWidget.h>
+
+namespace CellForge {
+
+class MyApp : public Application {
+public:
+    MyApp(int argc, char** argv)
+        : Application({"My App"}, std::make_unique<QtApplicationPlatform>(argc, argv))
+    {}
+
+    void OnInit() override
+    {
+        // create widgets, register event callbacks …
+    }
+
+    void OnUpdate() override
+    {
+        // called every tick — check window visibility, update simulation, etc.
+        if (m_Window && !m_Window->isVisible())
+            Close();
+    }
+
+    void OnShutdown() override { /* cleanup */ }
+
+private:
+    QMainWindow* m_Window = nullptr;
+};
+
+Application* CreateApplication(int argc, char** argv)
+{
+    return new MyApp(argc, argv);
+}
+
+} // namespace CellForge
 ```
+
+`EntryPoint.h` provides `main()` / `WinMain()` and calls `CreateApplication` → `Run()` → `delete`.
 
 ---
 
 ## vcpkg dependencies
 
-All binary dependencies are listed in [`vcpkg.json`](vcpkg.json) and installed automatically on first configure.
-Key packages:
-
 | Package | Used by |
 |---|---|
-| `eigen3` | Math, kinematics throughout |
-| `bullet3[multithreading,double-precision,rtti]` | Collision detection |
+| `spdlog` | Logging throughout |
+| `flecs` | ECS (core, workcell) |
+| `tracy` | Frame / scope profiling |
+| `yaml-cpp` | Application settings |
+| `qt6-base` | Qt platform backend, viewer |
+| `opencascade` | 3D geometry kernel (workcell, viewer) |
+| `eigen3` | Math, kinematics |
+| `bullet3` | Collision detection |
 | `fcl` | Flexible collision library |
-| `octomap` | Voxel-based environment representation |
 | `assimp` | Mesh loading |
-| `urdfdom` | URDF parsing |
-| `orocos-kdl` | KDL kinematic solver backend |
-| `pcl` | Point cloud support |
-| `console-bridge` | Logging |
-| `yaml-cpp` | Configuration / SRDF parsing |
-| `boost-dll`, `boost-filesystem`, … | Plugin loader, file I/O |
-| `cereal` | Serialization |
-| `opencascade` | 3D geometry kernel (OCCT) — CAD/CAM primitives, BRep modelling |
-| `qtbase` | Qt 6 Core / GUI / Widgets — UI layer |
-| `gtest` | Unit testing |
+| `boost-dll` | Plugin loader |
+| `gtest` | Unit tests |
 
-The custom triplet `cmake/triplets/x64-windows-release.cmake` builds all vcpkg packages as **dynamic-release** libraries, matching the Tesseract Windows CI configuration.
+All packages use the custom triplet `cmake/triplets/x64-windows-release.cmake` — dynamic-release libraries, matching the Tesseract Windows CI configuration.
 
 ---
 
-## Submodules
+## Vendored submodules
 
-| Submodule | Remote | Tag |
+| Submodule | Source | Version |
 |---|---|---|
 | `vendor/ros_industrial_cmake_boilerplate` | ros-industrial/ros_industrial_cmake_boilerplate | 0.7.4 |
 | `vendor/opw_kinematics` | Jmeyer1292/opw_kinematics | 0.5.3 |
+| `vendor/boost_plugin_loader` | tesseract-robotics/boost_plugin_loader | 0.4.3 |
 | `vendor/tesseract` | tesseract-robotics/tesseract | 0.34.x |
 
-`vendor/boost_plugin_loader` (tesseract-robotics/boost_plugin_loader 0.4.3) is included as a plain directory.
-
----
-
-## Adding CellForge application code
-
-Once the vendor packages are built into `<build_dir>/vendor_install/`, add your own targets at the bottom of `CMakeLists.txt`:
-
-```cmake
-list(APPEND CMAKE_PREFIX_PATH "${VENDOR_INSTALL_PREFIX}")
-find_package(tesseract_common      REQUIRED)
-find_package(tesseract_collision   REQUIRED)
-find_package(tesseract_kinematics  REQUIRED)
-find_package(tesseract_environment REQUIRED)
-
-add_subdirectory(src)
-```
+All vendor packages are built via CMake `ExternalProject` at build time and staged into `<build_dir>/vendor_install/`.
 
 ---
 
 ## License
 
-See [LICENSE](LICENSE).
+[LGPL-2.1-only](LICENSE) — © 2026 Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
