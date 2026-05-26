@@ -25,7 +25,6 @@ namespace CellForge {
 	std::map<std::string, Log::TagDetails> Log::s_DefaultTagDetails = {
 		{ "Animation",         TagDetails{  true, Level::Warn  } },
 		{ "Core",              TagDetails{  true, Level::Trace } },
-		{ "Memory",            TagDetails{  true, Level::Error } },
 		{ "Project",           TagDetails{  true, Level::Warn  } },
 		{ "Renderer",          TagDetails{  true, Level::Info  } },
 		{ "Workcell",          TagDetails{  true, Level::Info  } },
@@ -63,7 +62,7 @@ namespace CellForge {
 		appSinks[1]->set_pattern("%^[%T] %n: %v%$");
 #endif
 
-		s_CoreLogger = std::make_shared<spdlog::logger>("cellForge", cellForgeSinks.begin(), cellForgeSinks.end());
+		s_CoreLogger = std::make_shared<spdlog::logger>("CellForge", cellForgeSinks.begin(), cellForgeSinks.end());
 		s_CoreLogger->set_level(spdlog::level::trace);
 
 		s_ClientLogger = std::make_shared<spdlog::logger>("APP", appSinks.begin(), appSinks.end());

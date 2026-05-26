@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 find_package(ros_industrial_cmake_boilerplate REQUIRED)
-project(cellforge_platform_qt VERSION 0.1.0 LANGUAGES CXX)
+project(cellforge_platform VERSION 0.1.0 LANGUAGES CXX)
 
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -11,16 +11,14 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/cellforge_macros.cmake)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/")
 cellforge_variables()
 
-# ─── Dependencies ─────────────────────────────────────────────────────────────
+# ─── Qt platform library ──────────────────────────────────────────────────────
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
-
 set(CMAKE_AUTOMOC ON)
 
-# ─── Library ─────────────────────────────────────────────────────────────────
 add_library(cellforge_platform_qt SHARED
-    src/ViewPortWidget.cpp
-    src/QtApplicationPlatform.cpp
-    # Listed explicitly so AUTOMOC processes Q_OBJECT in the include tree.
+    src/qt/ViewPortWidget.cpp
+    src/qt/QtApplicationPlatform.cpp
+    # Explicit listing so AUTOMOC processes Q_OBJECT in the include tree.
     include/CellForge/qt/widgets/ViewPortWidget.h
 )
 add_library(CellForge::platform_qt ALIAS cellforge_platform_qt)
@@ -50,6 +48,13 @@ target_link_libraries(cellforge_platform_qt
         CellForge::core
         Qt6::Widgets
 )
+
+# ─── MFC platform library (Windows only) ─────────────────────────────────────
+# Lives in its own subdirectory so CMAKE_MFC_FLAG=2 (UseOfMfc=Dynamic) is scoped
+# only to the MFC targets and does not affect the Qt library above.
+if(WIN32)
+    add_subdirectory(mfc)
+endif()
 
 # ─── Install & CMake package export ───────────────────────────────────────────
 include(CMakePackageConfigHelpers)
@@ -94,8 +99,11 @@ install(
 
 set(SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS} "platform_qt" PARENT_SCOPE)
 
-# ─── Sub-directories ─────────────────────────────────────────────────────────
-option(CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES "Build platform_qt example application" OFF)
-if(CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES)
+# ─── Examples ────────────────────────────────────────────────────────────────
+option(CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES  "Build Qt platform example"  OFF)
+option(CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES "Build MFC platform example" OFF)
+
+if(CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES OR
+   (WIN32 AND CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES))
     add_subdirectory(examples)
 endif()
