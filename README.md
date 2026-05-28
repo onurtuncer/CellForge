@@ -1,6 +1,7 @@
 # CellForge
 
 [![Windows](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml)
+[![Linux](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml)
 
 A Windows-first C++ application framework for industrial robotics and automation.  
 CellForge provides a platform-agnostic core with typed events, an ECS-based workcell model, and pluggable platform backends — currently Qt 6 and Win32/MFC — that each drive `Application::Run()` without coupling the core to any GUI toolkit.
