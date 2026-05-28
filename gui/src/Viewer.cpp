@@ -12,6 +12,7 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Line.hxx>
 #include <AIS_Point.hxx>
+#include <AIS_Shape.hxx>
 #include <Aspect_DisplayConnection.hxx>
 #include <Aspect_Handle.hxx>
 #include <Geom_CartesianPoint.hxx>
@@ -83,6 +84,8 @@ void Viewer::init(Aspect_Handle windowHandle)
   rp.NbMsaaSamples         = 8;
   rp.IsShadowEnabled       = false;
   rp.CollectedStats         = Graphic3d_RenderingParams::PerfCounters_NONE;
+
+  m_interactor = new ViewerInteractor(m_view, m_context);
 }
 
 void Viewer::redrawView()
@@ -93,6 +96,49 @@ void Viewer::redrawView()
 void Viewer::resizeView()
 {
   m_view->MustBeResized();
+}
+
+void Viewer::displayShapes(const std::vector<TopoDS_Shape>& shapes)
+{
+  clearShapes();
+  m_aisShapes.reserve(shapes.size());
+  for (const TopoDS_Shape& shape : shapes)
+  {
+    Handle(AIS_Shape) ais = new AIS_Shape(shape);
+    m_aisShapes.push_back(ais);
+    m_context->Display(ais, false);
+  }
+  m_context->UpdateCurrentViewer();
+}
+
+void Viewer::clearShapes()
+{
+  for (const Handle(AIS_Shape)& ais : m_aisShapes)
+    m_context->Remove(ais, false);
+  m_aisShapes.clear();
+  m_context->UpdateCurrentViewer();
+}
+
+void Viewer::fitAll()
+{
+  m_view->FitAll(0.01, true);
+}
+
+void Viewer::setBackgroundColor(const Quantity_Color& color)
+{
+  m_view->SetBackgroundColor(color);
+  m_view->Redraw();
+}
+
+void Viewer::setDisplayMode(AIS_DisplayMode mode)
+{
+  m_context->SetDisplayMode(static_cast<Standard_Integer>(mode), false);
+  m_context->UpdateCurrentViewer();
+}
+
+ViewerInteractor* Viewer::interactor() const
+{
+  return m_interactor.get();
 }
 
 void Viewer::drawPoint(int px, int py)

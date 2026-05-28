@@ -20,13 +20,6 @@
 #include <string_view>
 #include <utility>
 
-#define CF_ASSERT_MESSAGE_BOX (!CF_DIST && CF_PLATFORM_WINDOWS)
-
-#if CF_ASSERT_MESSAGE_BOX
-	#ifdef CF_PLATFORM_WINDOWS
-		#include <Windows.h>
-	#endif
-#endif
 
 namespace CellForge {
 
@@ -229,10 +222,6 @@ namespace CellForge {
 		auto logger = (type == Type::Core) ? GetCoreLogger() : GetClientLogger();
 		auto formatted = std::format(message, std::forward<Args>(args)...);
 		logger->error("{0}: {1}", prefix, formatted);
-
-#if CF_ASSERT_MESSAGE_BOX
-		MessageBoxA(nullptr, formatted.data(), "CellForge Assert", MB_OK | MB_ICONERROR);
-#endif
 	}
 
 
@@ -240,8 +229,5 @@ namespace CellForge {
 	{
 		auto logger = (type == Type::Core) ? GetCoreLogger() : GetClientLogger();
 		logger->error("{0}", prefix);
-#if CF_ASSERT_MESSAGE_BOX
-		MessageBoxA(nullptr, "No message :(", "CellForge Assert", MB_OK | MB_ICONERROR);
-#endif
 	}
 }

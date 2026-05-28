@@ -52,6 +52,11 @@ target_link_libraries(cellforge_platform_mfc
     PUBLIC
         CellForge::core
         CellForge::viewer   # IViewerWidget.h is a public header dep
+    PRIVATE
+        TKernel     # Standard_*, OSD_*
+        TKV3d       # AIS_*, PrsMgr_*, SelectMgr_*, V3d_*
+        TKService   # Aspect_*
+        TKBRep      # TopoDS_*
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────

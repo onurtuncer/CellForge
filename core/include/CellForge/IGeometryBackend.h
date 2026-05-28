@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "CellForge/Math.h"
+#include "CellForge/Mathematics.h"
 
 #include <cstdint>
 #include <string_view>

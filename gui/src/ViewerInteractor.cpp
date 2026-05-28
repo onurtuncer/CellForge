@@ -67,6 +67,12 @@ void ViewerInteractor::KeyUp(Aspect_VKey key, double time)
   ProcessKeyPress(key | myKeys.Modifiers());
 }
 
+void ViewerInteractor::FlushEvents()
+{
+  if (!m_view.IsNull())
+    FlushViewEvents(m_ctx, m_view, true);
+}
+
 void ViewerInteractor::ProcessKeyPress(Aspect_VKey key)
 {
   if (m_ctx.IsNull() || m_view.IsNull())

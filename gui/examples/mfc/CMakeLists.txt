@@ -13,6 +13,8 @@ project(cellforge_viewer_mfc_example LANGUAGES CXX)
 # Cancel CMAKE_AUTOMOC inherited from the parent gui/examples scope — no Qt here.
 set(CMAKE_AUTOMOC OFF)
 
+find_package(OpenCASCADE REQUIRED)
+
 # UseOfMfc=Dynamic must be set at directory scope so the VS generator applies it
 # to the target; VS_GLOBAL_UseOfMfc is the per-target override.
 set(CMAKE_MFC_FLAG 2)
@@ -26,7 +28,6 @@ target_compile_definitions(cellforge_viewer_mfc_example PRIVATE
     _AFXDLL
     UNICODE
     _UNICODE
-    WIN32_LEAN_AND_MEAN
 )
 
 set_property(TARGET cellforge_viewer_mfc_example PROPERTY VS_GLOBAL_UseOfMfc "2")
@@ -36,6 +37,7 @@ target_link_libraries(cellforge_viewer_mfc_example
         CellForge::platform_mfc
         CellForge::viewer
         CellForge::core
+        TKPrim          # BRepPrimAPI_Make*
 )
 
 set_target_properties(cellforge_viewer_mfc_example PROPERTIES

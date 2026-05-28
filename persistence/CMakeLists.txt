@@ -51,7 +51,7 @@ target_include_directories(persistence
 
 target_link_libraries(persistence
     PUBLIC
-        CellForge::core       # IPersistenceBackend, IGeometryBackend (ShapeId), Math.h
+        CellForge::core       # IPersistenceBackend, IGeometryBackend (ShapeId), Mathematics.h
     PRIVATE
         TKernel               # Standard_*, Handle, TCollection_*
         TKCAF                 # TDF_*, TDocStd_*

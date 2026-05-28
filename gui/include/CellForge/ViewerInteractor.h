@@ -50,6 +50,10 @@ public:
 
   void ProcessKeyPress(Aspect_VKey theKey);
 
+  // Flush accumulated view events and redraw. Call after forwarding each
+  // Qt input event (mouse move/press/wheel/key) from the platform layer.
+  void FlushEvents();
+
 private:
   Handle(V3d_View)               m_view;
   Handle(AIS_InteractiveContext) m_ctx;

@@ -10,7 +10,8 @@
 cmake_minimum_required(VERSION 3.18)
 project(cellforge_viewer_examples LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6         REQUIRED COMPONENTS Widgets)
+find_package(OpenCASCADE REQUIRED)
 set(CMAKE_AUTOMOC ON)
 
 add_executable(cellforge_viewer_example main.cpp)
@@ -25,6 +26,7 @@ target_link_libraries(cellforge_viewer_example
         CellForge::viewer
         CellForge::core
         Qt6::Widgets
+        TKPrim          # BRepPrimAPI_Make*
 )
 
 set_target_properties(cellforge_viewer_example PROPERTIES

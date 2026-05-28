@@ -61,6 +61,11 @@ target_link_libraries(cellforge_platform_qt
         CellForge::core
         CellForge::viewer
         Qt6::Widgets
+    PRIVATE
+        TKernel     # Standard_*, OSD_*
+        TKV3d       # AIS_*, PrsMgr_*, SelectMgr_*, V3d_*
+        TKService   # Aspect_*
+        TKBRep      # TopoDS_*
 )
 
 # ─── MFC platform library (Windows only) ─────────────────────────────────────

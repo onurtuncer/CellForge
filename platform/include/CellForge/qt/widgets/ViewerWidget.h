@@ -12,19 +12,25 @@
 #include <CellForge/Event/Event.h>
 #include <CellForge/IViewerWidget.h>
 
+#include <QElapsedTimer>
 #include <QWidget>
 #include <functional>
 
 class QPaintEvent;
 class QResizeEvent;
 class QMouseEvent;
+class QWheelEvent;
+class QKeyEvent;
 
 namespace CellForge {
 
 class Viewer;
 
-// Qt widget that hosts an OCCT 3D view and translates Qt events into
-// CellForge typed events delivered through setEventCallback.
+// Qt widget that hosts an OCCT 3D view.
+// Mouse navigation (orbit = left drag, pan = middle drag, zoom = wheel) and
+// keyboard shortcuts (F = fit-all, S/W = shaded/wireframe, T/B/L/R =
+// standard views) are handled by the OCCT AIS_ViewController pipeline.
+// Shape display and view controls are forwarded to the owned Viewer.
 class ViewerWidget : public QWidget, public IViewerWidget
 {
     Q_OBJECT
@@ -43,21 +49,28 @@ public:
     using EventCallbackFn = std::function<void(Event&)>;
     void setEventCallback(EventCallbackFn cb) override;
 
+    // Shape display API
+    void displayShapes(const std::vector<TopoDS_Shape>& shapes) override;
+    void clearShapes()                                           override;
+    void fitAll()                                                override;
+    void setBackgroundColor(const Quantity_Color& color)         override;
+    void setDisplayMode(AIS_DisplayMode mode)                    override;
+
 private:
-    // Qt event overrides are private implementation details; the public
-    // contract is the CellForge EventCallbackFn above.
-    void paintEvent(QPaintEvent*  event) override;
-    void resizeEvent(QResizeEvent* event) override;
+    void paintEvent(QPaintEvent*   event) override;
+    void resizeEvent(QResizeEvent*  event) override;
+    void mousePressEvent(QMouseEvent*   event) override;
+    void mouseMoveEvent(QMouseEvent*    event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void wheelEvent(QWheelEvent*   event) override;
+    void keyPressEvent(QKeyEvent*   event) override;
+    void keyReleaseEvent(QKeyEvent* event) override;
 
     void ensureViewer();
 
     Viewer*         m_viewer        = nullptr;
     bool            m_isInitialized = false;
-    bool            m_hasStartPoint = false;
-    int             m_startX        = 0;
-    int             m_startY        = 0;
+    QElapsedTimer   m_timer;
     EventCallbackFn m_callback;
 };
 
