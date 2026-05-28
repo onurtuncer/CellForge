@@ -2,7 +2,7 @@
   "name": "cellforge",
   "version": "0.1.0",
   "builtin-baseline": "8528134bac3d39db8d36f4097755a97a1394e4dc",
-  "description": "CellForge robotics application (Tesseract-based)",
+  "description": "CellForge robotics SDK",
   "dependencies": [
     "eigen3",
     "cereal",

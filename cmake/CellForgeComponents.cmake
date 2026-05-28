@@ -14,11 +14,12 @@
 # the vendor headers exist.  For now, viewer only needs vcpkg packages
 # (Qt6, OpenCASCADE) which are available at configure time.
 
-option(CELLFORGE_BUILD_CORE            "Build core platform-agnostic library" ON)
-option(CELLFORGE_BUILD_WORKCELL        "Build flecs ECS workcell library"     ON)
-option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"        ON)
-option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"     OFF)
-option(CELLFORGE_BUILD_PLATFORM_QT     "Build Qt platform backend"            ON)
+option(CELLFORGE_BUILD_CORE            "Build core platform-agnostic library"     ON)
+option(CELLFORGE_BUILD_WORKCELL        "Build flecs ECS workcell library"         ON)
+option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"            ON)
+option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"         OFF)
+option(CELLFORGE_BUILD_PLATFORM_QT     "Build Qt platform backend"                ON)
+option(CELLFORGE_BUILD_PERSISTENCE     "Build OCAF document persistence backend"  ON)
 
 if(CELLFORGE_BUILD_CORE)
   add_subdirectory(core)
@@ -35,4 +36,9 @@ endif()
 # platform must come after core (depends on CellForge::core target)
 if(CELLFORGE_BUILD_PLATFORM_QT)
   add_subdirectory(platform)
+endif()
+
+# persistence must come after core (IPersistenceBackend lives in CellForge::core)
+if(CELLFORGE_BUILD_PERSISTENCE)
+  add_subdirectory(persistence)
 endif()

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#define CF_VERSION "2026.0.0"
+#define CF_VERSION "2026.0.1"
 
 //
 // Build Configuration

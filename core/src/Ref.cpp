@@ -12,7 +12,7 @@
 #include <mutex>
 #include <unordered_set>
 
-namespace Hazel {
+namespace CellForge {
 
 	static std::unordered_set<void*> s_LiveReferences;
 	static std::mutex s_LiveReferenceMutex;
