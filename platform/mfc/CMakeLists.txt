@@ -54,4 +54,39 @@ target_link_libraries(cellforge_platform_mfc
         CellForge::viewer   # IViewerWidget.h is a public header dep
 )
 
+# ─── Install & CMake package export ───────────────────────────────────────────
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+install(TARGETS cellforge_platform_mfc
+    EXPORT                  CellForge-platform_mfc-targets
+    RUNTIME_DEPENDENCY_SET  CF_runtime_deps
+    RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
+install(EXPORT CellForge-platform_mfc-targets
+    NAMESPACE   CellForge::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+    FILE        platform_mfc-targets.cmake
+)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/platform_mfc-config.cmake.in"
+"@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+find_dependency(CellForge REQUIRED COMPONENTS core viewer)
+if(NOT TARGET CellForge::platform_mfc)
+  include(\"\${CMAKE_CURRENT_LIST_DIR}/platform_mfc-targets.cmake\")
+endif()
+")
+configure_package_config_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/platform_mfc-config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/platform_mfc-config.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/platform_mfc-config.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+)
+
 set(SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS} "platform_mfc" PARENT_SCOPE)

@@ -7,7 +7,7 @@
 # License-Filename: LICENSE
 # ------------------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.21)
 
 # ─── vcpkg toolchain (must precede project()) ────────────────────────────────
 include(cmake/Vcpkg.cmake)
@@ -76,6 +76,42 @@ set(SUPPORTED_COMPONENTS "")
 
 include(cmake/CellForgeComponents.cmake)
 
+# ─── Runtime dependency bundling ──────────────────────────────────────────────
+# Resolves the transitive DLL closure of every CellForge target and installs
+# only the DLLs that are actually needed (not the full vcpkg/vendor bin dirs).
+# The two DIRECTORIES entries tell the resolver where to look:
+#   • vcpkg bin — Qt6, OCCT, Boost, spdlog, yaml-cpp, flecs, Tracy, …
+#   • vendor_install bin — Tesseract, boost_plugin_loader, …
+if(WIN32)
+  # vcpkg sets VCPKG_INSTALLED_DIR in manifest mode; fall back to the
+  # conventional in-source location when invoking component sub-builds.
+  if(NOT DEFINED VCPKG_INSTALLED_DIR)
+    set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_installed")
+  endif()
+
+  install(RUNTIME_DEPENDENCY_SET CF_runtime_deps
+      PRE_EXCLUDE_REGEXES
+          "api-ms-win-.*"     # Windows API sets — virtual, never on disk
+          "ext-ms-win-.*"
+      POST_EXCLUDE_REGEXES
+          ".*[Ss]ystem32[/\\\\].*\\.dll"   # Windows system DLLs
+          ".*[Ss]ys[Ww][Oo][Ww]64[/\\\\].*\\.dll"
+      DIRECTORIES
+          "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin"
+          "${VENDOR_INSTALL_PREFIX}/bin"
+      DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  )
+
+  # Tesseract factory/plugin DLLs are discovered at runtime by boost_plugin_loader
+  # and are therefore invisible to the static linker — install them explicitly.
+  install(DIRECTORY "${VENDOR_INSTALL_PREFIX}/bin/"
+      DESTINATION "${CMAKE_INSTALL_BINDIR}"
+      FILES_MATCHING
+          PATTERN "tesseract_*.dll"
+          PATTERN "boost_plugin_loader*.dll"
+  )
+endif()
+
 # ─── Umbrella package config ──────────────────────────────────────────────────
 # Generates lib/cmake/CellForge/CellForge-config.cmake so consumers can:
 #   find_package(CellForge REQUIRED COMPONENTS viewer)
@@ -86,6 +122,39 @@ include(cmake/CellForgeComponents.cmake)
 # Each component installs its own config to lib/cmake/CellForge/ so the
 # relative include resolves correctly.
 configure_package(COMPONENT CellForge SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS})
+
+# ─── Version file ─────────────────────────────────────────────────────────────
+# RICB's configure_package() writes ExactVersion; override with SameMajorVersion
+# so consumers can do find_package(CellForge 0.1) and get any 0.x release.
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/CellForge-config-version.cmake"
+    VERSION     "${PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+
+# ─── CPack / MSI installer ────────────────────────────────────────────────────
+set(CPACK_PACKAGE_NAME                "CellForge")
+set(CPACK_PACKAGE_VENDOR              "Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CellForge SDK — Qt6/OCCT visualisation and Tesseract motion planning")
+set(CPACK_PACKAGE_VERSION             "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR       "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR       "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH       "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY   "CellForge")
+set(CPACK_RESOURCE_FILE_LICENSE       "${CMAKE_SOURCE_DIR}/LICENSE")
+
+if(WIN32)
+  set(CPACK_GENERATOR "WIX")
+  # Stable product GUID — must NOT change between releases so WiX can match
+  # an existing installation and perform an in-place upgrade instead of a
+  # parallel install.  Regenerate only when intentionally breaking upgrades.
+  set(CPACK_WIX_UPGRADE_GUID "6E5D4C3B-2A19-4870-B6F5-E4D3C2B1A091")
+else()
+  set(CPACK_GENERATOR "TGZ")
+endif()
+
+include(CPack)
 
 # ─── Integration tests (ExternalProject — tests against installed tesseract) ──
 include(cmake/IntegrationTests.cmake)

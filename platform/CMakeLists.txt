@@ -75,7 +75,8 @@ include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
 install(TARGETS cellforge_platform_qt
-    EXPORT   CellForge-platform_qt-targets
+    EXPORT                  CellForge-platform_qt-targets
+    RUNTIME_DEPENDENCY_SET  CF_runtime_deps
     RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"
     LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
