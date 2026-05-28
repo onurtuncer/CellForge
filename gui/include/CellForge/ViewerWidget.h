@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 // Project: CellForge
 // Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
 // Author: Onur Tuncer, PhD
@@ -11,7 +11,10 @@
 
 #include "Viewer.h"
 
+#include <CellForge/Event/Event.h>
+
 #include <QWidget>
+#include <functional>
 
 namespace CellForge {
 
@@ -24,17 +27,20 @@ public:
 
   QPaintEngine* paintEngine() const override { return nullptr; }
 
-protected:
+  using EventCallbackFn = std::function<void(Event&)>;
+  void setEventCallback(EventCallbackFn cb);
+
+private:
   void paintEvent(QPaintEvent*  theEvent) override;
   void resizeEvent(QResizeEvent* theEvent) override;
   void mouseReleaseEvent(QMouseEvent* theEvent) override;
   void mouseDoubleClickEvent(QMouseEvent* event) override;
 
-private:
   Viewer* m_viewer        = nullptr;
   bool    m_isInitialized = false;
   bool    m_startDrawing  = false;
   QPoint  m_startP;
+  EventCallbackFn m_callback;
 };
 
 } // namespace CellForge

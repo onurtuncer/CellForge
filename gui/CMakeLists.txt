@@ -54,6 +54,7 @@ target_include_directories(viewer
 
 target_link_libraries(viewer
     PUBLIC
+        CellForge::core
         Qt6::Widgets
     PRIVATE
         TKernel     # Standard_Transient, Handle
