@@ -4,180 +4,166 @@ Introduction and Overview
 Abstract
 --------
 
-This document starts with a brief justification for the choice of
-**spatial vector algebra** (SVA) for flight simulation and
-GNC (guidance–navigation and control) applications. It then presents a
-complete, clean formulation of rigid-body flight dynamics using this
-formalism.
+CellForge is a Windows-first C++ application framework for industrial robotics
+and automation. It provides a platform-agnostic core with a typed event system,
+an ECS-based workcell model, and pluggable platform backends — currently Qt 6
+and Win32/MFC — each driving the same ``Application::Run()`` loop without
+coupling the core to any specific GUI toolkit.
 
-All equations are written in a global **inertial** frame :math:`W`.
-Therefore, Earth’s rotation influences only the atmospheric velocity,
-not the equations of motion themselves. This preserves the standard
-Featherstone free-body form.
+This document describes the framework's architecture, key concepts, and design
+decisions.
 
-The body frame is denoted :math:`B`, with its origin at the
-center-of-mass (CoM) of the flying body for convenience.
+Architecture Overview
+---------------------
 
-The state vector is
+CellForge is organized in layers:
 
-.. math::
+.. code-block:: text
 
-   x(t)
-   = \left( \mathbf{p}_W(t),\; q_{WB}(t),\;
-     \boldsymbol{\omega}_B(t),\;
-     \mathbf{v}_B(t),\; m(t) \right),
+   ┌─────────────────────────────────────────────────────────────┐
+   │                        Application                          │
+   │  Run() → platform->init()                                   │
+   │          OnInit()                                           │
+   │          loop { platform->pollEvents()                      │
+   │                 ProcessEvents()   ← CellForge event queue   │
+   │                 OnUpdate() }                                │
+   │          OnShutdown()                                       │
+   │          platform->shutdown()                               │
+   └──────────────────────┬──────────────────────────────────────┘
+                          │ IApplicationPlatform
+             ┌────────────┴────────────┐
+             │                         │
+    QtApplicationPlatform     MfcApplicationPlatform
+    QCoreApplication::         PeekMessage /
+    processEvents()            TranslateMessage /
+                               DispatchMessage
 
-where
+The ``Application`` class owns the main loop and lifecycle hooks. Platform
+backends implement ``IApplicationPlatform`` to bridge the native windowing
+system to the framework without exposing toolkit-specific types to application
+code.
 
-- :math:`\mathbf{p}_W(t)` is the position of the CoM in the inertial frame,
-- :math:`q_{WB}(t)` is the orientation quaternion of the body frame with
-  respect to the inertial frame,
-- :math:`\boldsymbol{\omega}_B(t)` and :math:`\mathbf{v}_B(t)` are angular
-  and linear velocity vectors expressed in the body frame,
-- :math:`m(t)` is the vehicle mass.
+Key Concepts
+------------
 
+Application Lifecycle
+~~~~~~~~~~~~~~~~~~~~~
+
+Every CellForge application subclasses ``Application`` and overrides three
+lifecycle hooks:
+
+``OnInit()``
+    Called once after the platform backend is initialized. Create windows,
+    register event callbacks, and set up the workcell here.
+
+``OnUpdate()``
+    Called every tick — poll sensor data, advance simulations, or check
+    window visibility.
+
+``OnShutdown()``
+    Called once before the platform backend tears down. Release resources
+    acquired in ``OnInit()``.
+
+The factory function ``CreateApplication(int argc, char** argv)`` must be
+provided by the application; ``EntryPoint.h`` supplies ``main()`` /
+``WinMain()`` and calls it.
+
+Event System
+~~~~~~~~~~~~
+
+CellForge uses a typed, dispatcher-based event system that is fully independent
+of Qt signals/slots or Win32 message maps:
+
+.. code-block:: cpp
+
+   // Platform widgets translate native events into CellForge events:
+   viewport->setEventCallback([this](Event& e) { OnEvent(e); });
+
+   // Application subclasses handle them via EventDispatcher:
+   EventDispatcher d(event);
+   d.dispatch<KeyPressedEvent>([](KeyPressedEvent& e) {
+       CF_CORE_INFO("key {}", static_cast<int>(e.keyCode()));
+       return false;
+   });
+
+All platform backends translate native events — Qt ``QKeyEvent``,
+Win32 ``WM_KEYDOWN``, and so on — into the same ``CellForge::Event``
+hierarchy, so application code is identical regardless of the active backend.
+
+ECS-Based Workcell Model
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The workcell layer (``CellForge::workcell``) models a robot cell as an
+Entity-Component-System (ECS) world built on the **flecs** library.
+Scene entities, robot links, and kinematic relationships are stored as
+flecs components and queried efficiently via the flecs query API.
+Geometry is represented using **OpenCASCADE** (OCCT) shapes attached to
+scene entities.
+
+Platform Backends
+~~~~~~~~~~~~~~~~~
+
+Both backends implement three hooks that ``Application::Run()`` calls at
+fixed points:
+
+.. code-block:: cpp
+
+   class IApplicationPlatform {
+   public:
+       virtual void init()       {}   // called once before OnInit()
+       virtual void pollEvents() {}   // called every tick (non-blocking pump)
+       virtual void shutdown()   {}   // called once after OnShutdown()
+   };
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
+
+   * - Backend
+     - ``init()``
+     - ``pollEvents()``
+   * - Qt
+     - Creates ``QApplication``, sets ``quitOnLastWindowClosed(false)``
+     - ``processEvents(AllEvents, 16 ms)``
+   * - MFC
+     - Creates ``CWinApp``, calls ``AfxWinInit`` + ``InitApplication``
+     - ``PeekMessage`` drain loop, 16 ms sleep when idle
 
 Nomenclature
 ------------
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 80
+   :widths: 30 70
 
-   * - Symbol
+   * - Term
      - Description
-   * - :math:`W`
-     - Inertial world frame (often chosen as ECI)
-   * - :math:`B`
-     - Body-fixed frame at the vehicle CoM
-   * - :math:`I`
-     - Earth–Centered Inertial (ECI) frame
-   * - :math:`E`
-     - Earth–fixed rotating frame (ECEF)
-   * - :math:`t`
-     - Time
-   * - :math:`x(t)`
-     - State vector :math:`(\mathbf{p}_W,q_{WB},\boldsymbol{\omega}_B,\mathbf{v}_B,m)`
-   * - :math:`u(t)`
-     - Control input (thrust magnitude, control torques)
-   * - :math:`m(t)`
-     - Vehicle mass
-   * - :math:`\dot{m}_{flow}(t)`
-     - Propellant mass flow rate
-   * - :math:`T(t)`
-     - Thrust magnitude
-   * - :math:`\boldsymbol{\tau}_{ctrl,B}(t,x)`
-     - Control torque in body frame
-   * - :math:`\mathbf{p}_W`
-     - Position of vehicle CoM in inertial frame :math:`W`
-   * - :math:`\mathbf{r}_W`
-     - Generic position vector expressed in :math:`W`
-   * - :math:`q_{WB}`
-     - Unit quaternion from body frame :math:`B` to inertial frame :math:`W`
-   * - :math:`R_{WB}`
-     - Rotation matrix corresponding to :math:`q_{WB}`
-   * - :math:`R_{BW}`
-     - Rotation matrix from :math:`W` to :math:`B`
-       (:math:`R_{BW}=R_{WB}^\top`)
-   * - :math:`\boldsymbol{\omega}_B`
-     - Angular velocity expressed in :math:`B`
-   * - :math:`\boldsymbol{\omega}_W`
-     - Angular velocity expressed in :math:`W`
-   * - :math:`\boldsymbol{\omega}_\oplus`
-     - Earth rotation vector
-   * - :math:`\mathbf{v}_B`
-     - Linear velocity of CoM expressed in :math:`B`
-   * - :math:`\mathbf{v}_W`
-     - Linear velocity of CoM expressed in :math:`W`
-   * - :math:`\mathbf{v}_{air,W}`
-     - Atmospheric (wind-free) velocity in :math:`W`
-   * - :math:`\mathbf{v}_{wind,W}`
-     - Wind velocity in :math:`W`
-   * - :math:`\mathbf{v}_{rel,W}`
-     - Relative airspeed in :math:`W`
-   * - :math:`\mathbf{v}`
-     - Spatial motion vector (twist)
-       :math:`[\boldsymbol{\omega}, \mathbf{v}]^\top`
-   * - :math:`\mathbf{a}`
-     - Spatial acceleration
-   * - :math:`\mathbf{f}`
-     - Spatial force vector (wrench)
-       :math:`[\mathbf{n}, \mathbf{f}]^\top`
-   * - :math:`\mathbf{v}_B`
-     - Vehicle twist expressed in :math:`B`
-   * - :math:`\mathbf{a}_B`
-     - Vehicle spatial acceleration expressed in :math:`B`
-   * - :math:`\mathbf{f}_B`
-     - Net spatial wrench acting on the body in :math:`B`
-   * - :math:`\mathbf{f}_{g,B}`
-     - Spatial wrench due to gravity
-   * - :math:`\mathbf{f}_{aero,B}`
-     - Spatial wrench due to aerodynamic forces
-   * - :math:`\mathbf{f}_{T,B}`
-     - Spatial wrench due to thrust
-   * - :math:`\mathbf{f}_{ctrl,B}`
-     - Spatial wrench due to control torques
-   * - :math:`\mathbf{g}_W(\mathbf{p}_W)`
-     - Gravity vector expressed in :math:`W`
-   * - :math:`\mathbf{F}_{g,W}, \mathbf{F}_{g,B}`
-     - Gravity force in :math:`W` and :math:`B`
-   * - :math:`\mathbf{F}_{aero,W}, \mathbf{F}_{aero,B}`
-     - Aerodynamic force in :math:`W` and :math:`B`
-   * - :math:`\mathbf{F}_{T,B}`
-     - Thrust force in :math:`B`
-   * - :math:`\hat{\mathbf{t}}_B`
-     - Thrust unit direction in :math:`B`
-   * - :math:`\rho`
-     - Atmospheric density
-   * - :math:`C_D`
-     - Aerodynamic drag coefficient
-   * - :math:`A`
-     - Reference area
-   * - :math:`\mathbf{I}_B(m)`
-     - Spatial inertia matrix in :math:`B` (block form)
-   * - :math:`\mathbf{J}_B(m)`
-     - Rotational inertia matrix about the CoM in :math:`B`
-   * - :math:`\mathbb{I}_F`
-     - General spatial inertia in frame :math:`F`
-   * - :math:`IC_F`
-     - Rotational inertia at COM expressed in frame :math:`F`
-   * - :math:`c_F`
-     - COM location in frame :math:`F`
-   * - :math:`I_3`
-     - :math:`3\times 3` identity matrix
-   * - :math:`[\cdot]_\times`
-     - Skew-symmetric matrix for 3-D cross products
-   * - :math:`\times, \times^*`
-     - Spatial cross-product operator on twists and wrenches
-   * - :math:`{}_A X_B`
-     - Spatial motion transform from frame :math:`B` to :math:`A`
-   * - :math:`{}_A X_B^*`
-     - Dual force transform (co-adjoint action)
-   * - :math:`\mathrm{ad}_{\mathbf{v}}`
-     - Adjoint action associated with twist :math:`\mathbf{v}`
-   * - :math:`\mathfrak{se}(3)`
-     - Lie algebra of :math:`SE(3)` (space of twists)
-   * - :math:`SE(3)`
-     - Special Euclidean group (rigid-body motions)
-   * - :math:`f(x,u)`
-     - Nonlinear state propagation model
-   * - :math:`h(x)`
-     - Measurement model
-   * - :math:`\mathbf{F}`
-     - State-transition Jacobian :math:`\partial f/\partial x`
-   * - :math:`\mathbf{H}`
-     - Measurement Jacobian :math:`\partial h/\partial x`
-   * - :math:`z`
-     - Measurement vector
-   * - :math:`v`
-     - Measurement noise
-   * - :math:`g_0`
-     - Standard gravity
-   * - :math:`I_{sp}`
-     - Propellant specific impulse
-   * - :math:`\omega_\oplus`
-     - Earth rotation rate magnitude
-
+   * - Application
+     - Base class for all CellForge applications; owns the main loop
+   * - IApplicationPlatform
+     - Pure-virtual interface implemented by Qt and MFC backends
+   * - Event
+     - Base class of the CellForge event hierarchy
+   * - EventDispatcher
+     - Typed dispatcher that routes an ``Event`` to registered handlers
+   * - EventQueue
+     - Thread-safe queue used to post events from platform threads
+   * - KeyPressedEvent / MouseMovedEvent / …
+     - Concrete typed event classes derived from ``Event``
+   * - Entity
+     - Lightweight identifier in the flecs ECS world
+   * - World
+     - The flecs ECS world; stores all entities and their components
+   * - Workcell
+     - A ``World`` populated with robot-cell entities and components
+   * - ViewportWidget
+     - OCCT-backed 3D viewport widget (Qt backend)
+   * - MfcViewportWnd
+     - OCCT-backed 3D viewport window (MFC backend)
+   * - CF_CORE_INFO / CF_INFO / …
+     - spdlog-backed logging macros (core-side and client-side)
+   * - CF_PROFILE_SCOPE / CF_PROFILE_FUNCTION
+     - Tracy profiling macros
 
 Abbreviations
 -------------
@@ -188,30 +174,17 @@ Abbreviations
 
    * - Abbreviation
      - Meaning
-   * - AD
-     - Algorithmic Differentiation
-   * - CoM
-     - Center of Mass
-   * - DoF
-     - Degree of Freedom
-   * - ECEF
-     - Earth-Centered Earth-Fixed (Frame :math:`E`)
-   * - ECI
-     - Earth-Centered Inertial (Frame :math:`I`)
-   * - EKF
-     - Extended Kalman Filter
-   * - FDM
-     - Flight Dynamics Model
-   * - FMU
-     - Functional Mock-up Unit
-   * - GNC
-     - Guidance, Navigation, and Control
-   * - GPS
-     - Global Positioning System
-   * - IMU
-     - Inertial Measurement Unit
-   * - ODE
-     - Ordinary Differential Equation
+   * - ECS
+     - Entity-Component-System
+   * - MFC
+     - Microsoft Foundation Classes
+   * - OCCT
+     - Open CASCADE Technology (OpenCASCADE geometry kernel)
+   * - Qt
+     - Qt 6 cross-platform application framework
    * - SVA
-     - Spatial Vector Algebra
-
+     - Spatial Vector Algebra (used in Tesseract kinematics)
+   * - UUID
+     - Universally Unique Identifier (entity key type)
+   * - VK
+     - Virtual Key (Win32 key-code namespace)
