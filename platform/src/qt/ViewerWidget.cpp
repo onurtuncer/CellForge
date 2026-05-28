@@ -72,9 +72,9 @@ void ViewerWidget::mouseReleaseEvent(QMouseEvent* event)
     const int nx = event->pos().x();
     const int ny = event->pos().y();
 
-    m_viewer->drawPoint(event->pos());
+    m_viewer->drawPoint(nx, ny);
     if (m_hasStartPoint)
-        m_viewer->drawLine(QPoint(m_startX, m_startY), event->pos());
+        m_viewer->drawLine(m_startX, m_startY, nx, ny);
     m_hasStartPoint = true;
     m_startX = nx;
     m_startY = ny;

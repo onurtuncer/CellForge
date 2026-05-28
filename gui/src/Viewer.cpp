@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 // Project: CellForge
 // Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
 // Author: Onur Tuncer, PhD
@@ -21,8 +21,7 @@
 #include <V3d_DirectionalLight.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
-
-#include <QPoint>
+#include <WNT_Window.hxx>
 
 namespace CellForge {
 
@@ -31,7 +30,7 @@ Viewer::Viewer(Aspect_Handle windowHandle)
   init(windowHandle);
 }
 
-void Viewer::init(const HANDLE& windowHandle)
+void Viewer::init(Aspect_Handle windowHandle)
 {
   static Handle(Aspect_DisplayConnection) displayConnection;
   if (displayConnection.IsNull())
@@ -96,21 +95,21 @@ void Viewer::resizeView()
   m_view->MustBeResized();
 }
 
-void Viewer::drawPoint(const QPoint& p)
+void Viewer::drawPoint(int px, int py)
 {
-  Standard_Real x, y, z;
-  m_view->Convert(p.x(), p.y(), x, y, z);
-  Handle(Geom_Point) gp   = new Geom_CartesianPoint(gp_Pnt(x, y, z));
-  Handle(AIS_Point)  prs  = new AIS_Point(gp);
+  double x, y, z;
+  m_view->Convert(px, py, x, y, z);
+  Handle(Geom_Point) gp  = new Geom_CartesianPoint(gp_Pnt(x, y, z));
+  Handle(AIS_Point)  prs = new AIS_Point(gp);
   m_context->Display(prs, true);
 }
 
-void Viewer::drawLine(const QPoint& p1, const QPoint& p2)
+void Viewer::drawLine(int x1, int y1, int x2, int y2)
 {
-  Standard_Real x, y, z;
-  m_view->Convert(p1.x(), p1.y(), x, y, z);
+  double x, y, z;
+  m_view->Convert(x1, y1, x, y, z);
   Handle(Geom_Point) gp1 = new Geom_CartesianPoint(gp_Pnt(x, y, z));
-  m_view->Convert(p2.x(), p2.y(), x, y, z);
+  m_view->Convert(x2, y2, x, y, z);
   Handle(Geom_Point) gp2 = new Geom_CartesianPoint(gp_Pnt(x, y, z));
   Handle(AIS_Line)   prs = new AIS_Line(gp1, gp2);
   m_context->Display(prs, true);

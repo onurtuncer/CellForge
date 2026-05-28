@@ -18,7 +18,6 @@ option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application" OFF)
 option(CELLFORGE_VIEWER_BUILD_TESTS    "Build viewer unit tests"          OFF)
 
 # ─── Dependencies ─────────────────────────────────────────────────────────────
-find_package(Qt6         REQUIRED COMPONENTS Widgets)
 find_package(OpenCASCADE REQUIRED)
 
 # ─── Library ─────────────────────────────────────────────────────────────────
@@ -47,7 +46,6 @@ target_include_directories(viewer
 
 target_link_libraries(viewer
     PUBLIC
-        Qt6::Widgets
     PRIVATE
         TKernel     # Standard_Transient, Handle
         TKMath      # gp_*, TColgp_*
@@ -79,7 +77,6 @@ install(EXPORT CellForge-viewer-targets
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in"
 "@PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
-find_dependency(Qt6 REQUIRED COMPONENTS Widgets)
 find_dependency(OpenCASCADE REQUIRED)
 if(NOT TARGET CellForge::viewer)
   include(\"\${CMAKE_CURRENT_LIST_DIR}/viewer-targets.cmake\")
