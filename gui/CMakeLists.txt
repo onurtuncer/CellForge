@@ -1,3 +1,12 @@
+﻿# ------------------------------------------------------------------------------------
+# Project: CellForge
+# Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
+# Author: Onur Tuncer, PhD
+#
+# SPDX-License-Identifier: LGPL-2.1-only
+# License-Filename: LICENSE
+# ------------------------------------------------------------------------------------
+
 cmake_minimum_required(VERSION 3.18)
 
 find_package(ros_industrial_cmake_boilerplate REQUIRED)
@@ -24,6 +33,7 @@ find_package(OpenCASCADE REQUIRED)
 add_library(viewer SHARED
     src/Viewer.cpp
     src/ViewerInteractor.cpp
+    src/ViewerApplication.cpp
 )
 add_library(CellForge::viewer ALIAS viewer)
 set_target_properties(viewer PROPERTIES OUTPUT_NAME cellforge_viewer)
@@ -46,6 +56,7 @@ target_include_directories(viewer
 
 target_link_libraries(viewer
     PUBLIC
+        CellForge::core
     PRIVATE
         TKernel     # Standard_Transient, Handle
         TKMath      # gp_*, TColgp_*

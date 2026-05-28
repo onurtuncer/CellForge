@@ -29,6 +29,11 @@ ViewportWidget::ViewportWidget(QWidget* parent)
     setMouseTracking(true);
 }
 
+void ViewportWidget::resize(int cx, int cy)
+{
+    QWidget::resize(cx, cy);
+}
+
 void ViewportWidget::setEventCallback(std::function<void(Event&)> cb)
 {
     m_EventQueue.setCallback(std::move(cb));

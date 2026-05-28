@@ -11,6 +11,7 @@
 
 #include <CellForge/IWindow.h>
 #include <CellForge/IViewPortWidget.h>
+#include <CellForge/IViewerWidget.h>
 
 #include <QMainWindow>
 #include <QWidget>
@@ -32,8 +33,9 @@ public:
 
     ~QtWindow() override = default;
 
-    void Show() override  { m_window->show(); }
+    void Show()  override { m_window->show(); }
     void Close() override { m_window->close(); }
+    bool IsOpen() const override { return m_window->isVisible(); }
 
     void SetTitle(const std::string& title) override
     {

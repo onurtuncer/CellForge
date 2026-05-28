@@ -7,91 +7,50 @@
 // License-Filename: LICENSE
 // ------------------------------------------------------------------------------------
 
-// Demonstrates CellForge Application owning the event loop via QtApplicationPlatform,
-// with an OCCT 3D viewer hosted inside a QMainWindow.
-//   - Application::Run() drives the loop; QApplication::exec() is never called.
-//   - ViewerWidget (platform/qt) translates Qt/OCCT events into typed CellForge events.
-//   - Events are routed through Application::OnEvent() and logged to the console.
+// Demonstrates ViewerApplication with the Qt backend.
+// OnInit() creates a QtWindow + ViewerWidget, wires them via wireViewer(), and
+// returns.  OnUpdate() / OnShutdown() are handled by ViewerApplication.
 
-#include <CellForge/Application.h>
+#include <CellForge/ViewerApplication.h>
 #include <CellForge/EntryPoint.h>
 #include <CellForge/Log.h>
-#include <CellForge/Event/EventDispatcher.h>
-#include <CellForge/Event/MouseEvents.h>
-#include <CellForge/Event/ApplicationEvent.h>
 #include <CellForge/qt/QtApplicationPlatform.h>
+#include <CellForge/qt/QtWindow.h>
 #include <CellForge/qt/widgets/ViewerWidget.h>
-
-#include <QMainWindow>
-#include <QWidget>
-#include <QHBoxLayout>
 
 namespace CellForge {
 
-class ViewerApp : public Application {
+class ViewerApp : public ViewerApplication {
 public:
     ViewerApp(int argc, char** argv)
-        : Application({"CellForge Viewer"},
-                      std::make_unique<QtApplicationPlatform>(argc, argv))
+        : ViewerApplication({"CellForge Viewer"},
+                            std::make_unique<QtApplicationPlatform>(argc, argv))
     {}
 
     void OnInit() override
     {
-        m_window = new QMainWindow();
-        m_window->setWindowTitle("CellForge — Qt Viewer Example");
+        m_qtWindow = std::make_unique<QtWindow>("CellForge — Qt Viewer Example", 900, 600);
 
-        QWidget* central = new QWidget(m_window);
-        m_window->setCentralWidget(central);
+        // ViewerWidget parented to the QMainWindow so Qt owns and destroys it.
+        m_viewer = new ViewerWidget(m_qtWindow->qtMainWindow());
+        m_qtWindow->qtMainWindow()->setCentralWidget(m_viewer);
 
-        auto* layout = new QHBoxLayout(central);
-        layout->setContentsMargins(0, 0, 0, 0);
+        m_qtWindow->Show();
+        wireViewer(m_qtWindow.get(), m_viewer);
 
-        m_viewer = new ViewerWidget(central);
-        layout->addWidget(m_viewer);
-
-        m_viewer->setEventCallback([this](Event& e) { OnEvent(e); });
-
-        AddEventCallback([](Event& event) {
-            EventDispatcher d(event);
-
-            d.dispatch<MouseButtonReleasedEvent>([](MouseButtonReleasedEvent& e) {
-                CF_CORE_INFO("[MouseReleased] button={} x={:.1f} y={:.1f}",
-                    static_cast<int>(e.button()), e.x(), e.y());
-                return false;
-            });
-            d.dispatch<MouseButtonPressedEvent>([](MouseButtonPressedEvent& e) {
-                CF_CORE_INFO("[MousePressed]  button={} x={:.1f} y={:.1f}",
-                    static_cast<int>(e.button()), e.x(), e.y());
-                return false;
-            });
-            d.dispatch<WindowResizeEvent>([](WindowResizeEvent& e) {
-                CF_CORE_INFO("[WindowResize]  {}x{}", e.width(), e.height());
-                return false;
-            });
-        });
-
-        m_window->resize(900, 600);
-        m_window->show();
-
-        CF_CORE_INFO("Viewer application running — click inside the viewport.");
-    }
-
-    void OnUpdate() override
-    {
-        if (m_window && !m_window->isVisible())
-            Close();
+        CF_CORE_INFO("Qt Viewer running — click to place points, double-click to restart.");
     }
 
     void OnShutdown() override
     {
-        CF_CORE_INFO("Application shutting down.");
-        delete m_window;
-        m_window = nullptr;
+        ViewerApplication::OnShutdown();
+        m_viewer = nullptr;        // Qt-owned; destroyed with the window
+        m_qtWindow.reset();
     }
 
 private:
-    QMainWindow*  m_window = nullptr;
-    ViewerWidget* m_viewer = nullptr;
+    std::unique_ptr<QtWindow> m_qtWindow;
+    ViewerWidget*             m_viewer = nullptr;
 };
 
 Application* CreateApplication(int argc, char** argv)

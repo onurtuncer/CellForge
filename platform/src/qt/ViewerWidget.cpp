@@ -34,6 +34,11 @@ ViewerWidget::~ViewerWidget()
     delete m_viewer;
 }
 
+void ViewerWidget::resize(int cx, int cy)
+{
+    QWidget::resize(cx, cy);
+}
+
 void ViewerWidget::setEventCallback(EventCallbackFn cb)
 {
     m_callback = std::move(cb);

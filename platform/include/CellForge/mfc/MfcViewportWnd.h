@@ -10,6 +10,7 @@
 #pragma once
 
 #include <CellForge/Event/EventQueue.h>
+#include <CellForge/IViewPortWidget.h>
 
 #ifndef _AFXDLL
 #define _AFXDLL
@@ -23,7 +24,7 @@ namespace CellForge {
 // MFC child window that translates Win32 input/window messages into typed
 // CellForge events and forwards them via EventQueue::dispatch().
 // Analogous to ViewportWidget on the Qt platform.
-class MfcViewportWnd : public CWnd {
+class MfcViewportWnd : public CWnd, public IViewportWidget {
     DECLARE_MESSAGE_MAP()
 
 public:
@@ -35,10 +36,10 @@ public:
     // pParent; call resize() from the parent's WM_SIZE handler to keep it in sync.
     bool create(CWnd* pParent, const RECT& rect);
 
-    void setEventCallback(std::function<void(Event&)> cb);
-
-    // Called by the parent when it is resized so the viewport fills the client area.
-    void resize(int cx, int cy);
+    // IViewportWidget
+    void* NativeHandle() override { return static_cast<void*>(m_hWnd); }
+    void  resize(int cx, int cy) override;
+    void  setEventCallback(std::function<void(Event&)> cb) override;
 
 protected:
     // ── Keyboard ──────────────────────────────────────────────────────────

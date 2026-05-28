@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 // Project: CellForge
 // Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
 // Author: Onur Tuncer, PhD
@@ -9,26 +9,33 @@
 
 #pragma once
 
-//TODO [Onur] check Hazel style does core is namespaced?
-namespace CellForge{
+#include <memory>
+#include <string>
 
-     class IWindow
-    {
-    public:
-        virtual ~IWindow() = default;
+namespace CellForge {
 
-        virtual void Show() = 0;
-        virtual void Close() = 0;
+class IViewportWidget;
 
-        virtual void SetTitle(const std::string& title) = 0;
-        virtual void SetSize(int width, int height) = 0;
+class IWindow
+{
+public:
+    virtual ~IWindow() = default;
 
-        virtual void SetCentralViewport(
-            std::shared_ptr<IViewportWidget> viewport) = 0;
+    virtual void Show()  = 0;
+    virtual void Close() = 0;
 
-        virtual void* NativeHandle() = 0;
-    };
+    // True while the window is open and visible; false after Close() or user dismissal.
+    // Used by ViewerApplication::OnUpdate() to detect when to end the loop.
+    virtual bool IsOpen() const = 0;
+
+    virtual void SetTitle(const std::string& title)  = 0;
+    virtual void SetSize(int width, int height)       = 0;
+
+    // Embeds a viewport widget as the window's central content area and takes
+    // responsibility for forwarding resize events to it.
+    virtual void SetCentralViewport(std::shared_ptr<IViewportWidget> viewport) = 0;
+
+    virtual void* NativeHandle() = 0;
+};
 
 } // namespace CellForge
-
-

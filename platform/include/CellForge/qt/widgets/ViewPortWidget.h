@@ -10,6 +10,7 @@
 #pragma once
 
 #include <CellForge/Event/EventQueue.h>
+#include <CellForge/IViewPortWidget.h>
 
 #include <QWidget>
 #include <functional>
@@ -22,14 +23,17 @@ class QCloseEvent;
 
 namespace CellForge {
 
-class ViewportWidget : public QWidget {
+class ViewportWidget : public QWidget, public IViewportWidget {
     Q_OBJECT
 
 public:
     explicit ViewportWidget(QWidget* parent = nullptr);
     ~ViewportWidget() override = default;
 
-    void setEventCallback(std::function<void(Event&)> cb);
+    // IViewportWidget
+    void* NativeHandle() override { return static_cast<void*>(this); }
+    void  resize(int cx, int cy) override;
+    void  setEventCallback(std::function<void(Event&)> cb) override;
 
 protected:
     // Names must be camelCase — Qt resolves virtual dispatch by exact name.

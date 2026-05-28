@@ -10,6 +10,7 @@
 #pragma once
 
 #include <CellForge/Event/Event.h>
+#include <CellForge/IViewerWidget.h>
 
 #include <QWidget>
 #include <functional>
@@ -24,7 +25,7 @@ class Viewer;
 
 // Qt widget that hosts an OCCT 3D view and translates Qt events into
 // CellForge typed events delivered through setEventCallback.
-class ViewerWidget : public QWidget
+class ViewerWidget : public QWidget, public IViewerWidget
 {
     Q_OBJECT
 
@@ -35,8 +36,12 @@ public:
     // Suppress Qt's default paint engine — OCCT owns the surface.
     QPaintEngine* paintEngine() const override { return nullptr; }
 
+    // IViewerWidget / IViewportWidget
+    void* NativeHandle() override { return static_cast<void*>(this); }
+    void  resize(int cx, int cy) override;
+
     using EventCallbackFn = std::function<void(Event&)>;
-    void setEventCallback(EventCallbackFn cb);
+    void setEventCallback(EventCallbackFn cb) override;
 
 private:
     // Qt event overrides are private implementation details; the public

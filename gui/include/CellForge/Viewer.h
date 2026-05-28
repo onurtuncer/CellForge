@@ -9,7 +9,7 @@
 
 #pragma once
 
-#ifdef _WIN32
+#ifdef CF_PLATFORM_WINDOWS
 #  include <Windows.h>
 #endif
 
