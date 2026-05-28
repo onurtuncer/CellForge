@@ -148,7 +148,7 @@ Equal = 61, /* = */
 		RightAlt = 346,
 		RightSuper = 347,
 		Menu = 348
-}Key;
+};
 
 enum class KeyState
 	{

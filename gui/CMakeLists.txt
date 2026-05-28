@@ -21,17 +21,10 @@ option(CELLFORGE_VIEWER_BUILD_TESTS    "Build viewer unit tests"          OFF)
 find_package(Qt6         REQUIRED COMPONENTS Widgets)
 find_package(OpenCASCADE REQUIRED)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 # ─── Library ─────────────────────────────────────────────────────────────────
 add_library(viewer SHARED
     src/Viewer.cpp
     src/ViewerInteractor.cpp
-    src/ViewerWidget.cpp
-    # List the Q_OBJECT header explicitly so AUTOMOC always finds and MOC-processes it,
-    # even though it lives in include/CellForge/ rather than next to the .cpp files.
-    include/CellForge/ViewerWidget.h
 )
 add_library(CellForge::viewer ALIAS viewer)
 set_target_properties(viewer PROPERTIES OUTPUT_NAME cellforge_viewer)
@@ -54,7 +47,6 @@ target_include_directories(viewer
 
 target_link_libraries(viewer
     PUBLIC
-        CellForge::core
         Qt6::Widgets
     PRIVATE
         TKernel     # Standard_Transient, Handle

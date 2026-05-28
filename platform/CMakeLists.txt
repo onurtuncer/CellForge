@@ -12,14 +12,17 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/")
 cellforge_variables()
 
 # ─── Qt platform library ──────────────────────────────────────────────────────
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6         REQUIRED COMPONENTS Widgets)
+find_package(OpenCASCADE REQUIRED)
 set(CMAKE_AUTOMOC ON)
 
 add_library(cellforge_platform_qt SHARED
     src/qt/ViewPortWidget.cpp
     src/qt/QtApplicationPlatform.cpp
-    # Explicit listing so AUTOMOC processes Q_OBJECT in the include tree.
+    src/qt/ViewerWidget.cpp
+    # Explicit listing so AUTOMOC processes Q_OBJECT headers in the include tree.
     include/CellForge/qt/widgets/ViewPortWidget.h
+    include/CellForge/qt/widgets/ViewerWidget.h
 )
 add_library(CellForge::platform_qt ALIAS cellforge_platform_qt)
 set_target_properties(cellforge_platform_qt PROPERTIES OUTPUT_NAME cellforge_platform_qt)
@@ -41,11 +44,13 @@ target_include_directories(cellforge_platform_qt
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge
+        ${OpenCASCADE_INCLUDE_DIR}
 )
 
 target_link_libraries(cellforge_platform_qt
     PUBLIC
         CellForge::core
+        CellForge::viewer
         Qt6::Widgets
 )
 
