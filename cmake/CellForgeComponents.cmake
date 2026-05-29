@@ -20,6 +20,7 @@ option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"          
 option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"         OFF)
 option(CELLFORGE_BUILD_PLATFORM_QT     "Build Qt platform backend"                ON)
 option(CELLFORGE_BUILD_PERSISTENCE     "Build OCAF document persistence backend"  ON)
+option(CELLFORGE_BUILD_PROJECT         "Build offline robot programming project model" ON)
 
 if(CELLFORGE_BUILD_CORE)
   add_subdirectory(core)
@@ -41,4 +42,9 @@ endif()
 # persistence must come after core (IPersistenceBackend lives in CellForge::core)
 if(CELLFORGE_BUILD_PERSISTENCE)
   add_subdirectory(persistence)
+endif()
+
+# project must come after core (IPersistenceBackend interface lives in CellForge::core)
+if(CELLFORGE_BUILD_PROJECT)
+  add_subdirectory(project)
 endif()
