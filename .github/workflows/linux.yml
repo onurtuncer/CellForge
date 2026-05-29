@@ -38,12 +38,7 @@ jobs:
       - name: Install vcpkg dependencies
         uses: johnwason/vcpkg-action@v8
         with:
-          pkgs: >-
-            fcl bullet3[multithreading,double-precision,rtti] octomap console-bridge
-            eigen3 yaml-cpp benchmark tinyxml2 assimp orocos-kdl pcl lapack-reference
-            cereal boost-dll boost-filesystem boost-program-options boost-graph
-            boost-stacktrace urdfdom ccd[double-precision] gtest catch2
-            opencascade qtbase
+          manifest-dir: ${{ github.workspace }}
           triplet: x64-linux-release
           extra-args: --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
           token: ${{ github.token }}
