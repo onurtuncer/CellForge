@@ -27,9 +27,10 @@ jobs:
           libxrandr-dev libxi-dev libxinerama-dev libxcursor-dev libxfixes-dev \
           libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev \
           libxcb-icccm4-dev libxcb-image0-dev libxcb-shm0-dev \
-          libxcb-util-dev libxcb-render-util0-dev libxcb-shape0-dev \
-          libxcb-randr0-dev libxcb-sync-dev libxcb-xfixes0-dev \
-          libxcb-xinerama0-dev libxcb-xkb-dev \
+          libxcb-util-dev libxcb-render0-dev libxcb-render-util0-dev \
+          libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev \
+          libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-xkb-dev \
+          libxcb-cursor-dev \
           libxkbcommon-dev libxkbcommon-x11-dev \
           libfontconfig1-dev libfreetype-dev \
           libdbus-1-dev
@@ -52,7 +53,7 @@ jobs:
         triplet: x64-linux-release
         extra-args: --classic --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
         token: ${{ github.token }}
-        cache-key: cellforge-vcpkg-ubuntu-latest-coverage-v2
+        cache-key: cellforge-vcpkg-ubuntu-latest-coverage-v3
 
     - name: Configure (GCC Debug + coverage flags)
       run: cmake --preset=gcc-debug
