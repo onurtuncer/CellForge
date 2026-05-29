@@ -27,6 +27,13 @@ find_package(yaml-cpp CONFIG REQUIRED)
 find_package(flecs    CONFIG REQUIRED)
 find_package(Tracy    CONFIG REQUIRED)
 
+# ─── Generated headers ────────────────────────────────────────────────────────
+configure_file(
+    include/CellForge/Version.h.in
+    "${CMAKE_CURRENT_BINARY_DIR}/include/CellForge/Version.h"
+    @ONLY
+)
+
 # ─── Library ─────────────────────────────────────────────────────────────────
 add_library(cellforge_core SHARED
     src/Application.cpp
@@ -65,6 +72,7 @@ target_compile_definitions(cellforge_core PUBLIC
 target_include_directories(cellforge_core
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge
@@ -119,7 +127,11 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/core-config.cmake"
 install(
     DIRECTORY   include/CellForge
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    FILES_MATCHING PATTERN "*.h"
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.h.in" EXCLUDE
+)
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/include/CellForge/Version.h"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/CellForge"
 )
 
 # Register with the root umbrella

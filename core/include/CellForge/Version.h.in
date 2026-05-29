@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 // Project: CellForge
 // Copyright (C) 2026, Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S., Istanbul
 // Author: Onur Tuncer, PhD
@@ -9,7 +9,10 @@
 
 #pragma once
 
-#define CF_VERSION "2026.0.1"
+#define CF_VERSION       "@CMAKE_PROJECT_VERSION@"
+#define CF_VERSION_MAJOR @CMAKE_PROJECT_VERSION_MAJOR@
+#define CF_VERSION_MINOR @CMAKE_PROJECT_VERSION_MINOR@
+#define CF_VERSION_PATCH @CMAKE_PROJECT_VERSION_PATCH@
 
 //
 // Build Configuration
@@ -29,7 +32,7 @@
 //
 #if defined(CF_PLATFORM_WINDOWS)
 	#define CF_BUILD_PLATFORM_NAME "Windows x64"
-#elif defined(HZ_PLATFORM_LINUX)
+#elif defined(CF_PLATFORM_LINUX)
 	#define CF_BUILD_PLATFORM_NAME "Linux"
 #else
 	#define CF_BUILD_PLATFORM_NAME "Unknown"
