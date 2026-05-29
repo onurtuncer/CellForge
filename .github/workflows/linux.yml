@@ -50,7 +50,8 @@ jobs:
           triplet: x64-linux-release
           extra-args: --classic --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
           token: ${{ github.token }}
-          cache-key: cellforge-vcpkg-ubuntu-24.04-v2
+          revision: '8528134bac3d39db8d36f4097755a97a1394e4dc'
+          cache-key: cellforge-vcpkg-ubuntu-24.04-v3
 
       - name: Configure
         run: |
