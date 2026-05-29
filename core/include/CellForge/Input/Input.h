@@ -11,9 +11,7 @@
 
 #include "KeyCodes.h"
 
-#include <map>
-#include <string_view>
-#include <vector>
+#include "PreCompiledHeader.h"
 
 namespace Hazel {
 

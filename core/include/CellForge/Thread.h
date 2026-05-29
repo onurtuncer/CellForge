@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include <string>
-#include <thread>
+#include "PreCompiledHeader.h"
 
 namespace CellForge {
 

@@ -9,25 +9,16 @@
 
 import os
 import sys
+import xml.etree.ElementTree as ET
 
-# Step 1: Add parent directory to sys.path
+# Add parent directory to sys.path so get_project_name is importable
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Step 2: Import the function
-from get_project_name import get_project_name
-
-# Step 3: Compute absolute path to CMakeLists.txt
-cmake_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'CMakeLists.txt'))
-
-# Step 4: Call the function
-project_name = get_project_name(cmake_path)
-print(f"Project name from top level: {project_name}")
-
-# -- Project information -----------------------------------------------------
-
-version_txt = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'version.txt'))
-with open(version_txt, 'r', encoding='utf-8') as _f:
-    _project_version = _f.read().strip()
+_package_xml = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'package.xml'))
+_pkg = ET.parse(_package_xml).getroot()
+project_name = _pkg.findtext('name').strip()
+_project_version = _pkg.findtext('version').strip()
+print(f"Project: {project_name} {_project_version}")
 
 project = project_name
 author = 'Onur Tuncer, PhD'

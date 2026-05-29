@@ -10,3 +10,6 @@
 [submodule "vendor/boost_plugin_loader"]
 	path = vendor/boost_plugin_loader
 	url = https://github.com/tesseract-robotics/boost_plugin_loader.git
+[submodule "vendor/pinocchio"]
+	path = vendor/pinocchio
+	url = https://github.com/stack-of-tasks/pinocchio.git

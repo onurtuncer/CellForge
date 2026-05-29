@@ -4,7 +4,7 @@
 <package format="3">
   <name>CellForge</name>
   <version>0.1.0</version>
-  <description>CellForge robotics application — Qt6/OCCT visualisation and Tesseract motion planning</description>
+  <description>CellForge robotics application — OCCT CAD and Tesseract motion planning</description>
   <maintainer email="contact@cellforge.dev">CellForge</maintainer>
   <license>MIT</license>
 

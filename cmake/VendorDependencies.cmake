@@ -54,6 +54,24 @@ ExternalProject_Add(vendor_boost_plugin_loader
     DEPENDS vendor_ricb
 )
 
+# 5. pinocchio ────────────────────────────────────────────────────────────────
+ExternalProject_Add(vendor_pinocchio
+    SOURCE_DIR        "${CMAKE_SOURCE_DIR}/vendor/pinocchio"
+    INSTALL_DIR       "${VENDOR_INSTALL_PREFIX}"
+    CMAKE_ARGS
+        ${_VENDOR_ARGS}
+        "-DBUILD_PYTHON_INTERFACE=OFF"
+        "-DBUILD_EXAMPLES=OFF"
+        "-DBUILD_BENCHMARK=OFF"
+        "-DBUILD_UTILS=OFF"
+        "-DBUILD_WITH_COLLISION_SUPPORT=OFF"
+        "-DINSTALL_DOCUMENTATION=OFF"
+        "-DGENERATE_PYTHON_STUBS=OFF"
+        "-DBUILD_ADVANCED_TESTING=OFF"
+    BUILD_ALWAYS      OFF
+    UPDATE_DISCONNECTED ON
+)
+
 # 4. tesseract ─────────────────────────────────────────────────────────────────
 ExternalProject_Add(vendor_tesseract
     SOURCE_DIR        "${CMAKE_SOURCE_DIR}/vendor/tesseract"
