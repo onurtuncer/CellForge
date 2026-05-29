@@ -22,7 +22,7 @@ jobs:
           ninja-build pkg-config gfortran \
           autoconf autoconf-archive automake libtool libltdl-dev \
           lcov gcovr gcc-13 g++-13 \
-          libgl-dev libglu1-mesa-dev \
+          libgl-dev libglu1-mesa-dev libdrm-dev libgbm-dev \
           libx11-dev libx11-xcb-dev libxext-dev libxrender-dev \
           libxrandr-dev libxi-dev libxinerama-dev libxcursor-dev libxfixes-dev \
           libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev \
