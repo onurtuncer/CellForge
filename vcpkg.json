@@ -1,7 +1,7 @@
 {
   "name": "cellforge",
   "version": "0.1.0",
-  "builtin-baseline": "8528134bac3d39db8d36f4097755a97a1394e4dc",
+  "builtin-baseline": "0fb79bb13588702a9e06057745b4aed95ce5c861",
   "description": "CellForge robotics SDK",
   "dependencies": [
     "eigen3",
