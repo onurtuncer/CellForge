@@ -30,6 +30,8 @@ function(cellforge_core_test target source)
 endfunction()
 
 # ─── Test executables ─────────────────────────────────────────────────────────
-cellforge_core_test(test_core_log  test_log.cpp)
-cellforge_core_test(test_core_uuid test_uuid.cpp)
-cellforge_core_test(test_core_ref  test_ref.cpp)
+cellforge_core_test(test_core_log        test_log.cpp)
+cellforge_core_test(test_core_uuid       test_uuid.cpp)
+cellforge_core_test(test_core_ref        test_ref.cpp)
+cellforge_core_test(test_core_ecs_entity test_ecs_entity.cpp)
+cellforge_core_test(test_core_ecs_world  test_ecs_world.cpp)
