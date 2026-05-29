@@ -12,15 +12,41 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
-    - name: Install dependencies
-      run: sudo apt update && sudo apt install -y lcov gcovr gcc-13 g++-13
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -y --no-install-recommends \
+          ninja-build pkg-config gfortran \
+          lcov gcovr gcc-13 g++-13 \
+          libgl-dev libglu1-mesa-dev \
+          libx11-dev libx11-xcb-dev libxext-dev libxrender-dev \
+          libxrandr-dev libxi-dev libxinerama-dev libxcursor-dev libxfixes-dev \
+          libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev \
+          libxcb-icccm4-dev libxcb-image0-dev libxcb-shm0-dev \
+          libxcb-util-dev libxcb-render-util0-dev libxcb-shape0-dev \
+          libxcb-randr0-dev libxcb-sync-dev libxcb-xfixes0-dev \
+          libxcb-xinerama0-dev libxcb-xkb-dev \
+          libxkbcommon-dev libxkbcommon-x11-dev \
+          libfontconfig1-dev libfreetype-dev \
+          libdbus-1-dev
 
     - name: Configure compiler alternatives
       run: |
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-13 100
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+
+    - name: Install vcpkg dependencies
+      uses: johnwason/vcpkg-action@v8
+      with:
+        manifest-dir: ${{ github.workspace }}
+        triplet: x64-linux-release
+        extra-args: --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
+        token: ${{ github.token }}
+        cache-key: cellforge-vcpkg-ubuntu-latest-coverage-v1
 
     - name: Configure (GCC Debug + coverage flags)
       run: cmake --preset=gcc-debug
@@ -52,7 +78,7 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        slug: onurtuncer/Aetherion
+        slug: onurtuncer/CellForge
         files: build/gcc-debug/coverage.xml
         fail_ci_if_error: false
         verbose: true
