@@ -5,9 +5,14 @@ on:
     branches: [ main ]
     paths:
       - 'doc/**'
-      - 'src/**'
-      - 'Aetherion/**'
+      - 'core/**'
+      - 'persistence/**'
+      - 'platform/**'
+      - 'gui/**'
+      - 'workcell/**'
       - 'get_project_name.py'
+      - 'version.txt'
+      - 'package.xml'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -75,7 +80,7 @@ jobs:
           mkdir -p "${OUT}"
           echo "Substituting Doxyfile.in placeholders..."
           sed \
-            -e "s|@CMAKE_PROJECT_NAME@|Aetherion|g" \
+            -e "s|@CMAKE_PROJECT_NAME@|CellForge|g" \
             -e "s|@CMAKE_SOURCE_DIR@|${REPO}|g" \
             -e "s|@CMAKE_BINARY_DIR@|${REPO}/build|g" \
             -e "s|@DOXYGEN_OUTPUT_DIR@|${OUT}|g" \
@@ -89,7 +94,7 @@ jobs:
         run: |
           echo "Building Sphinx docs..."
           sphinx-build -T -b html \
-            -Dbreathe_projects.Aetherion="$(pwd)/build/doxygen/xml" \
+            -Dbreathe_projects.CellForge="$(pwd)/build/doxygen/xml" \
             doc/ build/sphinx
           echo "Sphinx output pages: $(find build/sphinx -name '*.html' | wc -l)"
 
