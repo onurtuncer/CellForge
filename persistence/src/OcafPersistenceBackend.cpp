@@ -326,7 +326,7 @@ void OcafPersistenceBackend::deleteNode(NodeId nodeId)
     // Unregister first so children() skips this subtree.
     m_impl->unregisterSubtree(*lptr);
     // OCAF cannot physically delete labels; clear all attributes recursively.
-    lptr->ForgetAllAttributes(Standard_True);
+    lptr->ForgetAllAttributes(true);
 }
 
 bool OcafPersistenceBackend::reparent(NodeId nodeId, NodeId newParentId)
@@ -350,7 +350,7 @@ bool OcafPersistenceBackend::reparent(NodeId nodeId, NodeId newParentId)
     m_impl->reregisterSubtree(*src, reloc);
 
     // Clear the original (can't be physically removed from OCAF's label tree).
-    src->ForgetAllAttributes(Standard_True);
+    src->ForgetAllAttributes(true);
     return true;
 }
 

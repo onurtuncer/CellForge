@@ -22,7 +22,7 @@ jobs:
           ninja-build pkg-config gfortran \
           autoconf autoconf-archive automake libtool libltdl-dev \
           lcov gcovr gcc-13 g++-13 \
-          libgl-dev libglu1-mesa-dev libdrm-dev libgbm-dev \
+          libgl-dev libglu1-mesa-dev libdrm-dev libgbm-dev libegl-dev \
           libx11-dev libx11-xcb-dev libxext-dev libxrender-dev \
           libxrandr-dev libxi-dev libxinerama-dev libxcursor-dev libxfixes-dev \
           libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev \
@@ -30,9 +30,10 @@ jobs:
           libxcb-util-dev libxcb-render0-dev libxcb-render-util0-dev \
           libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev \
           libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-xkb-dev \
-          libxcb-cursor-dev \
+          libxcb-cursor-dev libxcb-xinput-dev \
           libxkbcommon-dev libxkbcommon-x11-dev \
           libfontconfig1-dev libfreetype-dev \
+          libsm-dev libice-dev \
           libdbus-1-dev
 
     - name: Configure compiler alternatives
