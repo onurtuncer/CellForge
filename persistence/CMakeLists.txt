@@ -56,7 +56,7 @@ target_link_libraries(persistence
         TKernel               # Standard_*, Handle, TCollection_*
         TKCAF                 # TDF_*, TDocStd_*
         TKLCAF                # TDataStd_*, TNaming_*
-        TKBinL                # BinDrivers, binary LCAF attribute drivers
+        TKBin                 # BinDrivers::DefineFormat (pulls in TKBinL transitively)
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────
