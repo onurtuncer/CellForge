@@ -55,11 +55,17 @@ ExternalProject_Add(vendor_boost_plugin_loader
 )
 
 # 5. pinocchio ────────────────────────────────────────────────────────────────
+# Use Ninja so each TU gets its own cl.exe invocation. MSBuild batches all 30
+# template-heavy TUs into one process which causes multi-hour optimizer hangs.
 ExternalProject_Add(vendor_pinocchio
     SOURCE_DIR        "${CMAKE_SOURCE_DIR}/vendor/pinocchio"
     INSTALL_DIR       "${VENDOR_INSTALL_PREFIX}"
+    CMAKE_GENERATOR   "Ninja"
     CMAKE_ARGS
         ${_VENDOR_ARGS}
+        "-DCMAKE_CXX_FLAGS=/wd4716 /EHsc"
+        "-DBUILD_SHARED_LIBS=OFF"
+        "-DBUILD_VISUALIZERS=OFF"
         "-DBUILD_PYTHON_INTERFACE=OFF"
         "-DBUILD_EXAMPLES=OFF"
         "-DBUILD_BENCHMARK=OFF"

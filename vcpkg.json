@@ -25,6 +25,7 @@
     "boost-program-options",
     "boost-graph",
     "boost-stacktrace",
+    "boost-logic",
     "urdfdom",
     {
       "name": "ccd",

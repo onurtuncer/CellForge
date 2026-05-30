@@ -1,9 +1,9 @@
-# CellForge
+# CellForge SDK
 
 [![Windows](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml)
 [![Linux](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml)
 
-A Windows-first C++ application framework for industrial robotics and automation.  
+A C++ SDK for industrial robotics and automation.  
 CellForge provides a platform-agnostic core with typed events, an ECS-based workcell model, and pluggable platform backends — currently Qt 6 and Win32/MFC — that each drive `Application::Run()` without coupling the core to any GUI toolkit.
 
 ---
@@ -39,7 +39,9 @@ CellForge provides a platform-agnostic core with typed events, an ECS-based work
 | `gui/` | `CellForge::viewer` | Interactive 3D viewer widget (Qt 6 + OpenCASCADE OCCT) |
 | `platform/` | `CellForge::platform_qt` | Qt 6 platform backend — `QtApplicationPlatform`, `ViewportWidget`, key/mouse event mapper |
 | `platform/` | `CellForge::platform_mfc` | Win32 / MFC platform backend — `MfcApplicationPlatform`, `MfcViewportWnd`, VK key mapper *(requires VS MFC component)* |
-| `vendor/` | — | Source-built dependencies: Tesseract, opw_kinematics, boost_plugin_loader, RICB |
+| `persistence/` | `CellForge::persistence` | OCAF document persistence backend |
+| `project/` | `CellForge::project` | Offline robot programming project model |
+| `vendor/` | — | Source-built dependencies: Tesseract, pinocchio, opw_kinematics, boost_plugin_loader, RICB |
 
 ### Event system
 
@@ -104,6 +106,8 @@ CellForge/
 │   └── src/
 ├── workcell/                   # CellForge::workcell — ECS robot cell
 ├── gui/                        # CellForge::viewer — Qt6 + OCCT 3D viewer
+├── persistence/                # CellForge::persistence — OCAF document backend
+├── project/                    # CellForge::project — offline programming model
 ├── platform/                   # Platform backends
 │   ├── include/CellForge/
 │   │   ├── qt/                 # Qt headers (ViewportWidget, QtApplicationPlatform, QtEventMapper)
@@ -116,11 +120,12 @@ CellForge/
 │       ├── qt/                 # Qt event log demo (example_event_log)
 │       └── mfc/                # MFC event log demo (example_mfc_event_log)
 ├── tests/
-└── vendor/                     # Git submodules
+└── vendor/                     # Git submodules (built via ExternalProject)
     ├── ros_industrial_cmake_boilerplate/
     ├── opw_kinematics/
     ├── boost_plugin_loader/
-    └── tesseract/
+    ├── tesseract/
+    └── pinocchio/              # Rigid-body dynamics library (built with Ninja)
 ```
 
 ---
@@ -130,10 +135,10 @@ CellForge/
 | Requirement | Version | Notes |
 |---|---|---|
 | Windows | 10 / 11 x64 | |
-| Visual Studio | 2022 (v143) or 2026 (v180) | **Desktop development with C++** workload |
+| Visual Studio | 2022 (v143) or newer | **Desktop development with C++** workload required |
 | CMake | ≥ 3.18 | |
+| Ninja | any | Required for pinocchio sub-build; included with VS |
 | vcpkg | latest | installed at `C:\vcpkg` (classic mode) |
-| Qt 6 | 6.x | via vcpkg |
 | MFC | — | *Optional* — "C++ MFC for latest build tools" VS Installer component, required only for `platform_mfc` |
 
 ### Install vcpkg (classic mode)
@@ -146,12 +151,17 @@ C:\vcpkg\bootstrap-vcpkg.bat
 
 > **Note:** CellForge uses vcpkg in **classic mode** — packages are installed to `C:\vcpkg\installed\`, not into the project directory. Do not use `vcpkg integrate install` or manifest mode.
 
-Install the required packages:
+Install the required packages. The `--classic` flag is needed when running from inside the repo directory (which contains a `vcpkg.json`):
 
 ```powershell
-vcpkg install spdlog flecs tracy qt6-base opencascade yaml-cpp `
-              eigen3 bullet3 fcl assimp boost-dll gtest `
-              --triplet x64-windows-release --classic
+vcpkg install --classic --triplet x64-windows-release `
+  "--overlay-triplets=cmake/triplets" `
+  eigen3 cereal console-bridge `
+  "bullet3[multithreading,double-precision,rtti]" `
+  fcl octomap yaml-cpp benchmark tinyxml2 assimp orocos-kdl pcl lapack-reference `
+  boost-dll boost-filesystem boost-program-options boost-graph boost-stacktrace boost-logic `
+  urdfdom "ccd[double-precision]" gtest catch2 `
+  spdlog tracy opencascade qtbase flecs
 ```
 
 ### Clone
@@ -171,14 +181,23 @@ git submodule update --init --recursive
 
 ## Build
 
-On first configure CMake automatically bootstraps `ros_industrial_cmake_boilerplate` from `vendor/` — this takes a few extra seconds once only.
+On first configure CMake automatically bootstraps `ros_industrial_cmake_boilerplate` from `vendor/` — this takes a few extra seconds once only. The pinocchio vendor package always uses Ninja internally (regardless of the top-level generator) to avoid multi-hour MSVC optimizer hangs on its template-heavy translation units.
 
 ### Visual Studio (recommended)
 
+The preset targets VS 2022; if you have a newer VS installed, pass `-G "Visual Studio 18 2026"` (or whichever matches your installation) explicitly:
+
 ```powershell
+# VS 2022
 cmake --preset windows-vs2022-x64-release
 cmake --build --preset windows-vs2022-x64-release
+
+# VS 2026 / newer — override the generator
+cmake -B build/vs-release --preset windows-vs2022-x64-release -G "Visual Studio 18 2026"
+cmake --build build/vs-release --config Release
 ```
+
+Both configure invocations automatically pass `-DVCPKG_MANIFEST_MODE=OFF` via the preset so that vcpkg uses the classically-installed packages in `C:\vcpkg\installed\`.
 
 ### Ninja (faster incremental builds)
 
@@ -203,9 +222,10 @@ cmake --build --preset windows-ninja-x64-debug
 | `CELLFORGE_BUILD_CORE` | `ON` | Core library |
 | `CELLFORGE_BUILD_WORKCELL` | `ON` | ECS workcell library |
 | `CELLFORGE_BUILD_VIEWER` | `ON` | Qt6 + OCCT viewer library |
+| `CELLFORGE_VIEWER_BUILD_EXAMPLES` | `OFF` | Standalone viewer example (`CellForgeViewerExample.exe`) |
 | `CELLFORGE_BUILD_PLATFORM_QT` | `ON` | Qt platform backend |
-| `CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES` | `OFF` | Qt event log example |
-| `CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES` | `OFF` | MFC event log example |
+| `CELLFORGE_BUILD_PERSISTENCE` | `ON` | OCAF document persistence backend |
+| `CELLFORGE_BUILD_PROJECT` | `ON` | Offline robot programming project model |
 
 ---
 
@@ -264,15 +284,26 @@ Application* CreateApplication(int argc, char** argv)
 | `spdlog` | Logging throughout |
 | `flecs` | ECS (core, workcell) |
 | `tracy` | Frame / scope profiling |
-| `yaml-cpp` | Application settings |
-| `qt6-base` | Qt platform backend, viewer |
-| `opencascade` | 3D geometry kernel (workcell, viewer) |
-| `eigen3` | Math, kinematics |
-| `bullet3` | Collision detection |
+| `yaml-cpp` | Application settings, SRDF parsing |
+| `qtbase` | Qt platform backend, viewer |
+| `opencascade` | 3D geometry kernel (workcell, viewer, persistence) |
+| `eigen3` | Math, kinematics throughout |
+| `cereal` | Serialization |
+| `console-bridge` | Logging bridge (tesseract) |
+| `bullet3[multithreading,double-precision,rtti]` | Collision detection |
 | `fcl` | Flexible collision library |
+| `ccd[double-precision]` | Convex collision detection |
+| `octomap` | Voxel environment representation |
 | `assimp` | Mesh loading |
+| `orocos-kdl` | KDL kinematic solver backend |
+| `pcl` | Point cloud support |
+| `lapack-reference` | Linear algebra (kinematics) |
+| `urdfdom` | URDF parsing |
+| `tinyxml2` | XML parsing |
+| `benchmark` | Benchmarking |
 | `boost-dll` | Plugin loader |
-| `gtest` | Unit tests |
+| `boost-filesystem`, `boost-program-options`, `boost-graph`, `boost-stacktrace`, `boost-logic` | Tesseract / boost_plugin_loader |
+| `gtest`, `catch2` | Unit / integration tests |
 
 All packages use the custom triplet `cmake/triplets/x64-windows-release.cmake` — dynamic-release libraries, matching the Tesseract Windows CI configuration.
 
@@ -280,14 +311,15 @@ All packages use the custom triplet `cmake/triplets/x64-windows-release.cmake` �
 
 ## Vendored submodules
 
-| Submodule | Source | Version |
+| Submodule | Source | Notes |
 |---|---|---|
-| `vendor/ros_industrial_cmake_boilerplate` | ros-industrial/ros_industrial_cmake_boilerplate | 0.7.4 |
-| `vendor/opw_kinematics` | Jmeyer1292/opw_kinematics | 0.5.3 |
-| `vendor/boost_plugin_loader` | tesseract-robotics/boost_plugin_loader | 0.4.3 |
-| `vendor/tesseract` | tesseract-robotics/tesseract | 0.34.x |
+| `vendor/ros_industrial_cmake_boilerplate` | ros-industrial/ros_industrial_cmake_boilerplate | CMake macros — bootstrapped first |
+| `vendor/opw_kinematics` | Jmeyer1292/opw_kinematics | Header-only analytical IK solver |
+| `vendor/boost_plugin_loader` | tesseract-robotics/boost_plugin_loader | Boost-based plugin loading |
+| `vendor/tesseract` | tesseract-robotics/tesseract | Core robotics framework |
+| `vendor/pinocchio` | stack-of-tasks/pinocchio | Rigid-body dynamics (built with Ninja to avoid MSVC optimizer hangs) |
 
-All vendor packages are built via CMake `ExternalProject` at build time and staged into `<build_dir>/vendor_install/`.
+All vendor packages are built via CMake `ExternalProject` at build time and staged into `<build_dir>/vendor_install/`. Each ExternalProject uses `UPDATE_DISCONNECTED ON` so that build-time re-configures (triggered by newly installed vendor files) do not attempt to re-run update steps.
 
 ---
 

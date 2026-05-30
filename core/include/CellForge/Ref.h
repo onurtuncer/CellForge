@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace Hazel {
+namespace CellForge {
 
 	class RefCounted
 	{
