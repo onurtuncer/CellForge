@@ -85,19 +85,13 @@ private:
 
 } // namespace CellForge
 
-// Must be at file scope, outside any namespace.
-IMPLEMENT_STANDARD_RTTIEXT(CellForge::CfShapeIdAttr, TDF_Attribute)
-
 namespace CellForge {
 
 // ─── TDF_Label comparator ─────────────────────────────────────────────────────
 
 struct LabelLess {
     bool operator()(const TDF_Label& a, const TDF_Label& b) const {
-        TCollection_AsciiString ea, eb;
-        a.EntryDumpToString(ea);
-        b.EntryDumpToString(eb);
-        return ea < eb;
+        return a.HasLowerNode(b);
     }
 };
 
@@ -120,7 +114,7 @@ static TCollection_ExtendedString sKey(std::string_view k) {
 }
 
 static TCollection_ExtendedString toExt(std::string_view sv) {
-    return TCollection_ExtendedString(sv.data(), static_cast<int>(sv.size()), Standard_True);
+    return TCollection_ExtendedString(std::string(sv).c_str());
 }
 
 // ─── Impl ─────────────────────────────────────────────────────────────────────
@@ -348,8 +342,9 @@ bool OcafPersistenceBackend::reparent(NodeId nodeId, NodeId newParentId)
 
     // Copy the entire subtree to a new child under newParent.
     TDF_Label newLabel = dst->NewChild();
-    Handle(TDF_RelocationTable) reloc = new TDF_RelocationTable(Standard_False);
-    TDF_CopyLabel::Translate(*src, newLabel, reloc);
+    TDF_CopyLabel copier(*src, newLabel);
+    copier.Perform();
+    Handle(TDF_RelocationTable) reloc = copier.RelocationTable();
 
     // Transfer NodeId mappings from old labels to their copies.
     m_impl->reregisterSubtree(*src, reloc);
@@ -486,11 +481,34 @@ bool OcafPersistenceBackend::removeAttribute(NodeId nodeId, std::string_view key
 
     nd->Backup();
     bool removed = false;
-    // Each type uses a different slot in NamedData — check all four.
-    removed |= static_cast<bool>(nd->ChangeReals().UnBind(rKey(key)));
-    removed |= static_cast<bool>(nd->ChangeIntegers().UnBind(bKey(key)));
-    removed |= static_cast<bool>(nd->ChangeStrings().UnBind(iKey(key)));
-    removed |= static_cast<bool>(nd->ChangeStrings().UnBind(sKey(key)));
+
+    auto rk = rKey(key);
+    if (nd->HasReal(rk)) {
+        NCollection_DataMap<TCollection_ExtendedString, double> m(nd->GetRealsContainer());
+        m.UnBind(rk);
+        nd->ChangeReals(m);
+        removed = true;
+    }
+
+    auto bk = bKey(key);
+    if (nd->HasInteger(bk)) {
+        NCollection_DataMap<TCollection_ExtendedString, int> m(nd->GetIntegersContainer());
+        m.UnBind(bk);
+        nd->ChangeIntegers(m);
+        removed = true;
+    }
+
+    // int64 and string both live in the strings map — handle in one pass.
+    auto ik = iKey(key);
+    auto sk = sKey(key);
+    if (nd->HasString(ik) || nd->HasString(sk)) {
+        NCollection_DataMap<TCollection_ExtendedString, TCollection_ExtendedString> m(
+            nd->GetStringsContainer());
+        removed |= static_cast<bool>(m.UnBind(ik));
+        removed |= static_cast<bool>(m.UnBind(sk));
+        nd->ChangeStrings(m);
+    }
+
     return removed;
 }
 
