@@ -22,7 +22,11 @@
 #include <V3d_DirectionalLight.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
-#include <WNT_Window.hxx>
+#ifdef _WIN32
+#  include <WNT_Window.hxx>
+#else
+#  include <Xw_Window.hxx>
+#endif
 
 namespace CellForge {
 
@@ -37,9 +41,13 @@ void Viewer::init(Aspect_Handle windowHandle)
   if (displayConnection.IsNull())
     displayConnection = new Aspect_DisplayConnection();
 
-  HWND winHandle = (HWND) windowHandle;
-  if (winHandle == NULL)
+#ifdef _WIN32
+  if ((HWND) windowHandle == NULL)
     return;
+#else
+  if (windowHandle == 0)
+    return;
+#endif
 
   Handle(OpenGl_GraphicDriver) graphicDriver =
       new OpenGl_GraphicDriver(displayConnection, false);
@@ -71,7 +79,11 @@ void Viewer::init(Aspect_Handle windowHandle)
   m_view->SetImmediateUpdate(false);
   m_view->SetBackgroundColor(Quantity_NOC_BLACK);
 
+#ifdef _WIN32
   Handle(Aspect_Window) wnd = new WNT_Window(windowHandle);
+#else
+  Handle(Aspect_Window) wnd = new Xw_Window(displayConnection, windowHandle);
+#endif
   m_view->SetWindow(wnd, nullptr);
   if (!wnd->IsMapped())
     wnd->Map();
