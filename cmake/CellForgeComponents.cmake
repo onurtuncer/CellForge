@@ -21,6 +21,7 @@ option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"       
 option(CELLFORGE_BUILD_PLATFORM_QT     "Build Qt platform backend"                ON)
 option(CELLFORGE_BUILD_PERSISTENCE     "Build OCAF document persistence backend"  ON)
 option(CELLFORGE_BUILD_PROJECT         "Build offline robot programming project model" ON)
+option(CELLFORGE_BUILD_ROBOT           "Build RobotModel (Tesseract + Pinocchio dual backend)" OFF)
 
 if(CELLFORGE_BUILD_CORE)
   add_subdirectory(core)
@@ -47,4 +48,9 @@ endif()
 # project must come after core (IPersistenceBackend interface lives in CellForge::core)
 if(CELLFORGE_BUILD_PROJECT)
   add_subdirectory(project)
+endif()
+
+# robot requires pinocchio (vendor) and tesseract (vendor) — both built via ExternalProject
+if(CELLFORGE_BUILD_ROBOT)
+  add_subdirectory(robot)
 endif()

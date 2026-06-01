@@ -7,7 +7,7 @@
 // License-Filename: LICENSE
 // ------------------------------------------------------------------------------------
 
-#include "cellforge/robot/RobotModel.hpp"
+#include "RobotModel.h"
 
 #include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/algorithm/kinematics.hpp>

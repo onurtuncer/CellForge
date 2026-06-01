@@ -20,7 +20,7 @@
 #include <tesseract_environment/environment.h>
 #include <tesseract_common/resource_locator.h>
 
-#include "cellforge/robot/RoboState.hpp"
+#include "robot/RoboState.hpp"
 
 namespace cellforge {
 
@@ -67,7 +67,7 @@ public:
     /// Push a state to BOTH backends atomically.
     /// After this call: Tesseract env has updated link transforms,
     /// Pinocchio data_ has updated FK.
-    void setState(const RobotState& state);
+    void setState(const RoboState& state);
 
     /// Read current state back from Tesseract (useful after IK writes to env).
     RoboState getState() const;

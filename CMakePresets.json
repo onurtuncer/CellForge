@@ -14,7 +14,8 @@
         "CELLFORGE_BUILD_PLATFORM_QT":              "ON",
         "CELLFORGE_VIEWER_BUILD_EXAMPLES":          "ON",
         "CELLFORGE_PLATFORM_QT_BUILD_EXAMPLES":     "ON",
-        "CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES":    "ON"
+        "CELLFORGE_PLATFORM_MFC_BUILD_EXAMPLES":    "ON",
+        "CELLFORGE_BUILD_ROBOT":                    "OFF"
       }
     },
     {
