@@ -59,7 +59,17 @@ ExternalProject_Add(vendor_boost_plugin_loader
 # template-heavy TUs into one process which causes multi-hour optimizer hangs.
 # MSVC /wd4716 /EHsc are Windows-only; GCC treats them as file paths on Linux.
 if(WIN32)
-    set(_pinocchio_cxx_flags "-DCMAKE_CXX_FLAGS=/wd4716 /EHsc")
+    # Use clang-cl for pinocchio: MSVC's optimizer hangs for hours on
+    # admm-solver.cpp's deeply-instantiated Eigen templates; clang handles
+    # the same code in seconds while still producing MSVC-ABI-compatible
+    # objects that link cleanly against the rest of the MSVC build.
+    set(_clangcl
+        "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang-cl.exe")
+    set(_pinocchio_cxx_flags
+        "-DCMAKE_C_COMPILER=${_clangcl}"
+        "-DCMAKE_CXX_COMPILER=${_clangcl}"
+        "-DCMAKE_CXX_FLAGS=/wd4716 /EHsc"
+    )
 else()
     set(_pinocchio_cxx_flags "")
 endif()
@@ -69,6 +79,13 @@ ExternalProject_Add(vendor_pinocchio
     CMAKE_GENERATOR   "Ninja"
     CMAKE_ARGS
         ${_VENDOR_ARGS}
+        # pinocchio 4.x uses jrl-cmakemodules which redefines find_package,
+        # add_executable, and add_library.  vcpkg.cmake overrides the same three
+        # commands; jrl's later redefinitions then alias _<cmd> back to vcpkg's
+        # own function/macro, causing 1000-level infinite recursion in all three.
+        # Fix: supply a custom toolchain (last -D wins) that sets up the vcpkg
+        # prefix path directly without including vcpkg.cmake at all.
+        "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/cmake/pinocchio_toolchain.cmake"
         ${_pinocchio_cxx_flags}
         "-DBUILD_SHARED_LIBS=OFF"
         "-DBUILD_VISUALIZERS=OFF"
