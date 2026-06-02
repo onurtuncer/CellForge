@@ -144,7 +144,7 @@ void Viewer::setBackgroundColor(const Quantity_Color& color)
 
 void Viewer::setDisplayMode(AIS_DisplayMode mode)
 {
-  m_context->SetDisplayMode(static_cast<Standard_Integer>(mode), false);
+  m_context->SetDisplayMode(static_cast<int>(mode), false);
   m_context->UpdateCurrentViewer();
 }
 
