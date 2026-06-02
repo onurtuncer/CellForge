@@ -25,13 +25,13 @@ jobs:
             fcl bullet3[multithreading,double-precision,rtti] octomap console-bridge
             eigen3 yaml-cpp benchmark tinyxml2 assimp orocos-kdl pcl lapack-reference
             cereal boost-dll boost-filesystem boost-program-options boost-graph
-            boost-stacktrace urdfdom ccd[double-precision] gtest catch2
+            boost-stacktrace boost-logic urdfdom ccd[double-precision] gtest catch2
             spdlog tracy flecs opencascade qtbase
           triplet: x64-windows-release
           extra-args: --classic --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
           token: ${{ github.token }}
           revision: '8528134bac3d39db8d36f4097755a97a1394e4dc'
-          cache-key: cellforge-vcpkg-windows-2022-v3
+          cache-key: cellforge-vcpkg-windows-2022-v4
 
       # Put cl.exe / nmake.exe / ninja.exe on PATH
       - name: Set up MSVC environment
