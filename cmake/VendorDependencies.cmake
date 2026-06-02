@@ -86,6 +86,8 @@ ExternalProject_Add(vendor_pinocchio
         # Fix: supply a custom toolchain (last -D wins) that sets up the vcpkg
         # prefix path directly without including vcpkg.cmake at all.
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/cmake/pinocchio_toolchain.cmake"
+        "-DVCPKG_INSTALLED_DIR=${VCPKG_INSTALLED_DIR}"
+        "-DCMAKE_PREFIX_PATH=${VENDOR_INSTALL_PREFIX};${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
         ${_pinocchio_cxx_flags}
         "-DBUILD_SHARED_LIBS=OFF"
         "-DBUILD_VISUALIZERS=OFF"
