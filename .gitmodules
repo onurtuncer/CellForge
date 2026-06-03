@@ -12,4 +12,4 @@
 	url = https://github.com/tesseract-robotics/boost_plugin_loader.git
 [submodule "vendor/pinocchio"]
 	path = vendor/pinocchio
-	url = https://github.com/stack-of-tasks/pinocchio.git
+	url = https://github.com/onurtuncer/pinocchio.git
