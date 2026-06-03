@@ -1,6 +1,6 @@
 [submodule "vendor/tesseract"]
 	path = vendor/tesseract
-	url = https://github.com/tesseract-robotics/tesseract.git
+	url = https://github.com/onurtuncer/tesseract.git
 [submodule "vendor/ros_industrial_cmake_boilerplate"]
 	path = vendor/ros_industrial_cmake_boilerplate
 	url = https://github.com/ros-industrial/ros_industrial_cmake_boilerplate.git
