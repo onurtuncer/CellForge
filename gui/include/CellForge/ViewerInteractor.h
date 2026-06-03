@@ -10,8 +10,9 @@
 #pragma once
 
 #include <AIS_ViewController.hxx>
-#include <TColgp_Array1OfPnt2d.hxx>
+#include <NCollection_Array1.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <gp_Pnt2d.hxx>
 
 class AIS_InteractiveContext;
 class V3d_View;
@@ -32,19 +33,19 @@ public:
   virtual bool UpdateMouseButtons(const NCollection_Vec2<int>& thePoint,
                                   Aspect_VKeyMouse             theButtons,
                                   Aspect_VKeyFlags             theModifiers,
-                                  bool                         theIsEmulated) Standard_OVERRIDE;
+                                  bool                         theIsEmulated) override;
 
   virtual void KeyDown(Aspect_VKey theKey,
                        double      theTime,
-                       double      thePressure = 1.0) Standard_OVERRIDE;
+                       double      thePressure = 1.0) override;
 
   virtual void KeyUp(Aspect_VKey theKey,
-                     double      theTime) Standard_OVERRIDE;
+                     double      theTime) override;
 
   virtual void ProcessExpose();
 
   virtual void handleViewRedraw(const Handle(AIS_InteractiveContext)& theCtx,
-                                const Handle(V3d_View)&               theView) Standard_OVERRIDE;
+                                const Handle(V3d_View)&               theView) override;
 
   virtual void ProcessConfigure();
 

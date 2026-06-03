@@ -63,13 +63,28 @@ if(WIN32)
     # admm-solver.cpp's deeply-instantiated Eigen templates; clang handles
     # the same code in seconds while still producing MSVC-ABI-compatible
     # objects that link cleanly against the rest of the MSVC build.
-    set(_clangcl
-        "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang-cl.exe")
-    set(_pinocchio_cxx_flags
-        "-DCMAKE_C_COMPILER=${_clangcl}"
-        "-DCMAKE_CXX_COMPILER=${_clangcl}"
-        "-DCMAKE_CXX_FLAGS=/wd4716 /EHsc"
-    )
+    #
+    # Locate clang-cl from the active VS installation.
+    # VCINSTALLDIR is exported by vcvarsall.bat / Developer PowerShell for every
+    # VS edition and version; clang-cl lives at Tools/Llvm/x64/bin/ inside it.
+    if(DEFINED ENV{VCINSTALLDIR})
+        file(TO_CMAKE_PATH "$ENV{VCINSTALLDIR}" _vcinstall)
+        set(_clangcl "${_vcinstall}/Tools/Llvm/x64/bin/clang-cl.exe")
+    endif()
+    if(NOT EXISTS "${_clangcl}")
+        find_program(_clangcl NAMES clang-cl NO_CACHE)
+    endif()
+
+    if(EXISTS "${_clangcl}")
+        set(_pinocchio_cxx_flags
+            "-DCMAKE_C_COMPILER=${_clangcl}"
+            "-DCMAKE_CXX_COMPILER=${_clangcl}"
+            "-DCMAKE_CXX_FLAGS=/wd4716 /EHsc"
+        )
+    else()
+        message(WARNING "vendor_pinocchio: clang-cl not found; falling back to MSVC (admm-solver.cpp may be slow)")
+        set(_pinocchio_cxx_flags "-DCMAKE_CXX_FLAGS=/wd4716 /EHsc")
+    endif()
 else()
     set(_pinocchio_cxx_flags "")
 endif()
@@ -77,6 +92,7 @@ ExternalProject_Add(vendor_pinocchio
     SOURCE_DIR        "${CMAKE_SOURCE_DIR}/vendor/pinocchio"
     INSTALL_DIR       "${VENDOR_INSTALL_PREFIX}"
     CMAKE_GENERATOR   "Ninja"
+    LIST_SEPARATOR    "|"
     CMAKE_ARGS
         ${_VENDOR_ARGS}
         # pinocchio 4.x uses jrl-cmakemodules which redefines find_package,
@@ -86,6 +102,8 @@ ExternalProject_Add(vendor_pinocchio
         # Fix: supply a custom toolchain (last -D wins) that sets up the vcpkg
         # prefix path directly without including vcpkg.cmake at all.
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/cmake/pinocchio_toolchain.cmake"
+        "-DVCPKG_INSTALLED_DIR=${VCPKG_INSTALLED_DIR}"
+        "-DCMAKE_PREFIX_PATH=${VENDOR_INSTALL_PREFIX}|${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
         ${_pinocchio_cxx_flags}
         "-DBUILD_SHARED_LIBS=OFF"
         "-DBUILD_VISUALIZERS=OFF"
