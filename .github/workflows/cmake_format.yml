@@ -6,10 +6,9 @@ on:
       - main
   pull_request:
     paths:
-      - 'Aetherion/**'
-      - 'src/**'
-      - 'CMakeLists.txt'
-      - 'package.xml'
+      - '**/CMakeLists.txt'
+      - '**/*.cmake'
+      - 'CMakePresets.json'
       - '.github/workflows/cmake_format.yml'
       - '**/.cmake-format'
       - '.run-cmake-format'

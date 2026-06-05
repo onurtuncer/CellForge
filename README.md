@@ -2,6 +2,9 @@
 
 [![Windows](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/windows.yml)
 [![Linux](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml)
+[![Clang-Format](https://github.com/onurtuncer/CellForge/actions/workflows/clang_format.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/clang_format.yml)
+[![CMake-Format](https://github.com/onurtuncer/CellForge/actions/workflows/cmake_format.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/cmake_format.yml)
+[![codecov](https://codecov.io/gh/onurtuncer/CellForge/branch/main/graph/badge.svg)](https://codecov.io/gh/onurtuncer/CellForge)
 
 A C++ SDK for industrial robotics and automation.  
 CellForge provides a platform-agnostic core with typed events, an ECS-based workcell model, and pluggable platform backends — currently Qt 6 and Win32/MFC — that each drive `Application::Run()` without coupling the core to any GUI toolkit.
