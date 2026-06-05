@@ -86,17 +86,16 @@ if(NOT TARGET CellForge::robot)
 endif()
 ")
 configure_package_config_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/robot-config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/robot-config.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/robot-config.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge")
+  "${CMAKE_CURRENT_BINARY_DIR}/robot-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/robot-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge" NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/robot-config.cmake" DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge")
 
 install(
   DIRECTORY include/CellForge
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+  FILES_MATCHING
+  PATTERN "*.h"
+  PATTERN "*.hpp")
 
 # Register with the root umbrella
 set(SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS} "robot" PARENT_SCOPE)
