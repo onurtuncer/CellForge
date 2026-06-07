@@ -24,46 +24,37 @@ cellforge_variables()
 
 # ─── Options ─────────────────────────────────────────────────────────────────
 option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application" OFF)
-option(CELLFORGE_VIEWER_BUILD_TESTS    "Build viewer unit tests"          OFF)
+option(CELLFORGE_VIEWER_BUILD_TESTS "Build viewer unit tests" OFF)
 
 # ─── Dependencies ─────────────────────────────────────────────────────────────
 find_package(OpenCASCADE REQUIRED)
 
 # ─── Library ─────────────────────────────────────────────────────────────────
-add_library(viewer SHARED
-    src/Viewer.cpp
-    src/ViewerInteractor.cpp
-    src/ViewerApplication.cpp
-)
+add_library(viewer SHARED src/Viewer.cpp src/ViewerInteractor.cpp src/ViewerApplication.cpp)
 add_library(CellForge::viewer ALIAS viewer)
 set_target_properties(viewer PROPERTIES OUTPUT_NAME cellforge_viewer)
 
 target_cxx_version(viewer PUBLIC VERSION ${CELLFORGE_CXX_VERSION})
 target_compile_options(viewer PRIVATE ${CELLFORGE_COMPILE_OPTIONS_PRIVATE})
-target_compile_options(viewer PUBLIC  ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
+target_compile_options(viewer PUBLIC ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
 target_compile_definitions(viewer PUBLIC ${CELLFORGE_COMPILE_DEFINITIONS})
 
-target_include_directories(viewer
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-        # OCCT headers are part of the public API (Viewer.h includes them),
-        # so consumers must be able to find them too.
-        $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge
-)
+target_include_directories(
+  viewer
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+         # OCCT headers are part of the public API (Viewer.h includes them), so consumers must be able to find them too.
+         $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge)
 
-target_link_libraries(viewer
-    PUBLIC
-        CellForge::core
-    PRIVATE
-        TKernel     # Standard_Transient, Handle
-        TKMath      # gp_*, TColgp_*
-        TKService   # Aspect_*, Graphic3d_*, WNT_Window (Windows)
-        TKV3d       # V3d_Viewer, V3d_View, AIS_InteractiveContext, AIS_ViewController
-        TKBRep      # TopoDS_Shape
-        TKOpenGl    # OpenGL rendering driver
+target_link_libraries(
+  viewer
+  PUBLIC CellForge::core
+  PRIVATE TKernel # Standard_Transient, Handle
+          TKMath # gp_*, TColgp_*
+          TKService # Aspect_*, Graphic3d_*, WNT_Window (Windows)
+          TKV3d # V3d_Viewer, V3d_View, AIS_InteractiveContext, AIS_ViewController
+          TKBRep # TopoDS_Shape
+          TKOpenGl # OpenGL rendering driver
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────
@@ -72,52 +63,49 @@ target_link_libraries(viewer
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-install(TARGETS viewer
-    EXPORT                  CellForge-viewer-targets
-    RUNTIME_DEPENDENCY_SET  CF_runtime_deps
-    RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"
-    LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-install(EXPORT CellForge-viewer-targets
-    NAMESPACE   CellForge::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-    FILE        viewer-targets.cmake
-)
+install(
+  TARGETS viewer
+  EXPORT CellForge-viewer-targets
+  RUNTIME_DEPENDENCY_SET CF_runtime_deps
+  RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(
+  EXPORT CellForge-viewer-targets
+  NAMESPACE CellForge::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+  FILE viewer-targets.cmake)
 
 # Generate viewer-config.cmake that finds dependencies and imports targets
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in"
-"@PACKAGE_INIT@
+file(
+  WRITE "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in"
+  "@PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
 find_dependency(OpenCASCADE REQUIRED)
 if(NOT TARGET CellForge::viewer)
-  include(\"\${CMAKE_CURRENT_LIST_DIR}/viewer-targets.cmake\")
+  include(\"${CMAKE_CURRENT_LIST_DIR}/viewer-targets.cmake\")
 endif()
 ")
 configure_package_config_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-    NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
+  "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge" NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-)
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge")
 
 install(
-    DIRECTORY   include/CellForge
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    FILES_MATCHING PATTERN "*.h"
-)
+  DIRECTORY include/CellForge
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING
+  PATTERN "*.h")
 
 # Register with the root umbrella (propagates to root's SUPPORTED_COMPONENTS)
 set(SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS} "viewer" PARENT_SCOPE)
 
 # ─── Sub-directories ─────────────────────────────────────────────────────────
 if(CELLFORGE_VIEWER_BUILD_EXAMPLES)
-    add_subdirectory(examples)
+  add_subdirectory(examples)
 endif()
 
 if(CELLFORGE_VIEWER_BUILD_TESTS)
-    add_subdirectory(test)
+  add_subdirectory(test)
 endif()

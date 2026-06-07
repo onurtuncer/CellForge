@@ -25,9 +25,7 @@ cellforge_variables()
 option(CELLFORGE_PROJECT_BUILD_TESTS "Build project unit tests" OFF)
 
 # ─── Library ──────────────────────────────────────────────────────────────────
-add_library(project SHARED
-    src/Project.cpp
-)
+add_library(project SHARED src/Project.cpp)
 add_library(CellForge::project ALIAS project)
 set_target_properties(project PROPERTIES OUTPUT_NAME cellforge_project)
 

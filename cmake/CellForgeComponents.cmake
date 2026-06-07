@@ -14,14 +14,14 @@
 # the vendor headers exist.  For now, viewer only needs vcpkg packages
 # (Qt6, OpenCASCADE) which are available at configure time.
 
-option(CELLFORGE_BUILD_CORE            "Build core platform-agnostic library"     ON)
-option(CELLFORGE_BUILD_WORKCELL        "Build flecs ECS workcell library"         ON)
-option(CELLFORGE_BUILD_VIEWER          "Build Qt6/OCCT viewer library"            ON)
-option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application"         OFF)
-option(CELLFORGE_BUILD_PLATFORM_QT     "Build Qt platform backend"                ON)
-option(CELLFORGE_BUILD_PERSISTENCE     "Build OCAF document persistence backend"  ON)
-option(CELLFORGE_BUILD_PROJECT         "Build offline robot programming project model" ON)
-option(CELLFORGE_BUILD_ROBOT           "Build RobotModel (Tesseract + Pinocchio dual backend)" OFF)
+option(CELLFORGE_BUILD_CORE "Build core platform-agnostic library" ON)
+option(CELLFORGE_BUILD_WORKCELL "Build flecs ECS workcell library" ON)
+option(CELLFORGE_BUILD_VIEWER "Build Qt6/OCCT viewer library" ON)
+option(CELLFORGE_VIEWER_BUILD_EXAMPLES "Build viewer example application" OFF)
+option(CELLFORGE_BUILD_PLATFORM_QT "Build Qt platform backend" ON)
+option(CELLFORGE_BUILD_PERSISTENCE "Build OCAF document persistence backend" ON)
+option(CELLFORGE_BUILD_PROJECT "Build offline robot programming project model" ON)
+option(CELLFORGE_BUILD_ROBOT "Build RobotModel (Tesseract + Pinocchio dual backend)" OFF)
 
 if(CELLFORGE_BUILD_CORE)
   add_subdirectory(core)

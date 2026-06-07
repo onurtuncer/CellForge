@@ -64,8 +64,7 @@ set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 message(STATUS "Doxygen output dir: ${DOXYGEN_OUTPUT_DIR}")
 message(STATUS "Sphinx build dir: ${SPHINX_BUILD}")
 
-# Only regenerate Sphinx when: - Doxygen has rerun - Our doc files have been updated - The Sphinx config has been
-# updated
+# Only regenerate Sphinx when: - Doxygen has rerun - Our doc files have been updated - The Sphinx config has been updated
 add_custom_command(
   OUTPUT ${SPHINX_INDEX_FILE}
   COMMAND ${SPHINX_EXECUTABLE} -b html -Dbreathe_projects.${CMAKE_PROJECT_NAME}=${DOXYGEN_OUTPUT_DIR}/xml

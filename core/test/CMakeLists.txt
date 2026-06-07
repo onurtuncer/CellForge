@@ -17,25 +17,21 @@ include(Catch)
 
 # ─── Shared helper to register a core test executable ─────────────────────────
 function(cellforge_core_test target source)
-    add_executable(${target} ${source})
-    target_compile_features(${target} PRIVATE cxx_std_20)
-    # CF_RELEASE: satisfies Version.h; disables assert message boxes on Windows.
-    target_compile_definitions(${target} PRIVATE CF_RELEASE)
-    target_link_libraries(${target}
-        PRIVATE
-            Catch2::Catch2WithMain
-            CellForge::core
-    )
-    catch_discover_tests(${target} DISCOVERY_MODE PRE_TEST)
+  add_executable(${target} ${source})
+  target_compile_features(${target} PRIVATE cxx_std_20)
+  # CF_RELEASE: satisfies Version.h; disables assert message boxes on Windows.
+  target_compile_definitions(${target} PRIVATE CF_RELEASE)
+  target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain CellForge::core)
+  catch_discover_tests(${target} DISCOVERY_MODE PRE_TEST)
 endfunction()
 
 # ─── Test executables ─────────────────────────────────────────────────────────
-cellforge_core_test(test_core_log               test_log.cpp)
-cellforge_core_test(test_core_uuid              test_uuid.cpp)
-cellforge_core_test(test_core_ref               test_ref.cpp)
-cellforge_core_test(test_core_ecs_entity        test_ecs_entity.cpp)
-cellforge_core_test(test_core_ecs_world         test_ecs_world.cpp)
-cellforge_core_test(test_core_event_dispatcher  test_event_dispatcher.cpp)
-cellforge_core_test(test_core_event_types       test_event_types.cpp)
-cellforge_core_test(test_core_app_settings      test_application_settings.cpp)
-cellforge_core_test(test_core_base_flags        test_base_flags.cpp)
+cellforge_core_test(test_core_log test_log.cpp)
+cellforge_core_test(test_core_uuid test_uuid.cpp)
+cellforge_core_test(test_core_ref test_ref.cpp)
+cellforge_core_test(test_core_ecs_entity test_ecs_entity.cpp)
+cellforge_core_test(test_core_ecs_world test_ecs_world.cpp)
+cellforge_core_test(test_core_event_dispatcher test_event_dispatcher.cpp)
+cellforge_core_test(test_core_event_types test_event_types.cpp)
+cellforge_core_test(test_core_app_settings test_application_settings.cpp)
+cellforge_core_test(test_core_base_flags test_base_flags.cpp)

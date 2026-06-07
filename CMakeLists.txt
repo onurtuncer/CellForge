@@ -13,14 +13,14 @@ cmake_minimum_required(VERSION 3.21)
 include(cmake/Vcpkg.cmake)
 
 # ─── Staging prefix ───────────────────────────────────────────────────────────
-# Defined here (before project()) so the RICB bootstrap below can use it.
-# VendorDependencies.cmake reads this cache variable; setting it once is enough.
+# Defined here (before project()) so the RICB bootstrap below can use it. VendorDependencies.cmake reads this cache
+# variable; setting it once is enough.
 set(VENDOR_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/vendor_install"
     CACHE PATH "Staging install prefix for vendored and first-party packages")
 file(MAKE_DIRECTORY "${VENDOR_INSTALL_PREFIX}")
 
-# Make installed packages findable for all subsequent find_package() calls,
-# including those inside add_subdirectory'd components.
+# Make installed packages findable for all subsequent find_package() calls, including those inside add_subdirectory'd
+# components.
 list(PREPEND CMAKE_PREFIX_PATH "${VENDOR_INSTALL_PREFIX}")
 
 # ─── Bootstrap: ros_industrial_cmake_boilerplate ──────────────────────────────
@@ -31,23 +31,16 @@ find_package(ros_industrial_cmake_boilerplate QUIET)
 if(NOT ros_industrial_cmake_boilerplate_FOUND)
   message(STATUS "CellForge: bootstrapping ros_industrial_cmake_boilerplate (first configure only)…")
   execute_process(
-    COMMAND "${CMAKE_COMMAND}"
-      -S "${CMAKE_SOURCE_DIR}/vendor/ros_industrial_cmake_boilerplate"
-      -B "${CMAKE_BINARY_DIR}/bootstrap/ricb"
-      -G "${CMAKE_GENERATOR}"
-      "-DCMAKE_INSTALL_PREFIX=${VENDOR_INSTALL_PREFIX}"
+    COMMAND
+      "${CMAKE_COMMAND}" -S "${CMAKE_SOURCE_DIR}/vendor/ros_industrial_cmake_boilerplate" -B
+      "${CMAKE_BINARY_DIR}/bootstrap/ricb" -G "${CMAKE_GENERATOR}" "-DCMAKE_INSTALL_PREFIX=${VENDOR_INSTALL_PREFIX}"
       -DCMAKE_BUILD_TYPE=Release
-    RESULT_VARIABLE _ricb_cfg
-  )
+    RESULT_VARIABLE _ricb_cfg)
   if(_ricb_cfg)
     message(FATAL_ERROR "RICB configure failed (exit ${_ricb_cfg})")
   endif()
-  execute_process(
-    COMMAND "${CMAKE_COMMAND}"
-      --build "${CMAKE_BINARY_DIR}/bootstrap/ricb"
-      --target install --config Release
-    RESULT_VARIABLE _ricb_build
-  )
+  execute_process(COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}/bootstrap/ricb" --target install --config
+                          Release RESULT_VARIABLE _ricb_build)
   if(_ricb_build)
     message(FATAL_ERROR "RICB install failed (exit ${_ricb_build})")
   endif()
@@ -89,27 +82,29 @@ if(WIN32)
     set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_installed")
   endif()
 
-  install(RUNTIME_DEPENDENCY_SET CF_runtime_deps
-      PRE_EXCLUDE_REGEXES
-          "api-ms-win-.*"     # Windows API sets — virtual, never on disk
-          "ext-ms-win-.*"
-      POST_EXCLUDE_REGEXES
-          ".*[Ss]ystem32[/\\\\].*\\.dll"   # Windows system DLLs
-          ".*[Ss]ys[Ww][Oo][Ww]64[/\\\\].*\\.dll"
-      DIRECTORIES
-          "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin"
-          "${VENDOR_INSTALL_PREFIX}/bin"
-      DESTINATION "${CMAKE_INSTALL_BINDIR}"
-  )
+  install(
+    RUNTIME_DEPENDENCY_SET
+    CF_runtime_deps
+    PRE_EXCLUDE_REGEXES
+    "api-ms-win-.*" # Windows API sets — virtual, never on disk
+    "ext-ms-win-.*"
+    POST_EXCLUDE_REGEXES
+    ".*[Ss]ystem32[/\\].*\.dll" # Windows system DLLs
+    ".*[Ss]ys[Ww][Oo][Ww]64[/\\].*\.dll"
+    DIRECTORIES
+    "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin"
+    "${VENDOR_INSTALL_PREFIX}/bin"
+    DESTINATION
+    "${CMAKE_INSTALL_BINDIR}")
 
-  # Tesseract factory/plugin DLLs are discovered at runtime by boost_plugin_loader
-  # and are therefore invisible to the static linker — install them explicitly.
-  install(DIRECTORY "${VENDOR_INSTALL_PREFIX}/bin/"
-      DESTINATION "${CMAKE_INSTALL_BINDIR}"
-      FILES_MATCHING
-          PATTERN "tesseract_*.dll"
-          PATTERN "boost_plugin_loader*.dll"
-  )
+  # Tesseract factory/plugin DLLs are discovered at runtime by boost_plugin_loader and are therefore invisible to the
+  # static linker — install them explicitly.
+  install(
+    DIRECTORY "${VENDOR_INSTALL_PREFIX}/bin/"
+    DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    FILES_MATCHING
+    PATTERN "tesseract_*.dll"
+    PATTERN "boost_plugin_loader*.dll")
 endif()
 
 # ─── Umbrella package config ──────────────────────────────────────────────────
@@ -127,22 +122,19 @@ configure_package(COMPONENT CellForge SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENT
 # RICB's configure_package() writes ExactVersion; override with SameMajorVersion
 # so consumers can do find_package(CellForge 0.1) and get any 0.x release.
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/CellForge-config-version.cmake"
-    VERSION     "${PROJECT_VERSION}"
-    COMPATIBILITY SameMajorVersion
-)
+write_basic_package_version_file("${CMAKE_BINARY_DIR}/CellForge-config-version.cmake" VERSION "${PROJECT_VERSION}"
+                                 COMPATIBILITY SameMajorVersion)
 
 # ─── CPack / MSI installer ────────────────────────────────────────────────────
-set(CPACK_PACKAGE_NAME                "CellForge")
-set(CPACK_PACKAGE_VENDOR              "Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S.")
+set(CPACK_PACKAGE_NAME "CellForge")
+set(CPACK_PACKAGE_VENDOR "Melina Aero Teknoloji Gelistirme ve Dizayn Burosu A.S.")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CellForge SDK — Qt6/OCCT visualisation and Tesseract motion planning")
-set(CPACK_PACKAGE_VERSION             "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_VERSION_MAJOR       "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR       "${PROJECT_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH       "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY   "CellForge")
-set(CPACK_RESOURCE_FILE_LICENSE       "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "CellForge")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 
 if(WIN32)
   set(CPACK_GENERATOR "WIX")

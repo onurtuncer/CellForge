@@ -20,39 +20,37 @@
 
 # --- Locate the vcpkg install tree ------------------------------------
 if(NOT DEFINED _Z_PINOCCHIO_VCPKG_INSTALLED_DIR)
-    if(DEFINED VCPKG_INSTALLED_DIR AND EXISTS "${VCPKG_INSTALLED_DIR}")
-        set(_Z_PINOCCHIO_VCPKG_INSTALLED_DIR "${VCPKG_INSTALLED_DIR}")
-    elseif(DEFINED ENV{VCPKG_ROOT} AND EXISTS "$ENV{VCPKG_ROOT}/installed")
-        set(_Z_PINOCCHIO_VCPKG_INSTALLED_DIR "$ENV{VCPKG_ROOT}/installed")
-    endif()
+  if(DEFINED VCPKG_INSTALLED_DIR AND EXISTS "${VCPKG_INSTALLED_DIR}")
+    set(_Z_PINOCCHIO_VCPKG_INSTALLED_DIR "${VCPKG_INSTALLED_DIR}")
+  elseif(DEFINED ENV{VCPKG_ROOT} AND EXISTS "$ENV{VCPKG_ROOT}/installed")
+    set(_Z_PINOCCHIO_VCPKG_INSTALLED_DIR "$ENV{VCPKG_ROOT}/installed")
+  endif()
 endif()
 
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
-    set(VCPKG_TARGET_TRIPLET "x64-windows-release")
+  set(VCPKG_TARGET_TRIPLET "x64-windows-release")
 endif()
 
 if(DEFINED _Z_PINOCCHIO_VCPKG_INSTALLED_DIR
-        AND EXISTS "${_Z_PINOCCHIO_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+   AND EXISTS "${_Z_PINOCCHIO_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
 
-    set(_Z_PINOCCHIO_PREFIX
-        "${_Z_PINOCCHIO_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+  set(_Z_PINOCCHIO_PREFIX "${_Z_PINOCCHIO_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
 
-    # Prepend so our packages take priority over any system ones.
-    list(PREPEND CMAKE_PREFIX_PATH  "${_Z_PINOCCHIO_PREFIX}")
-    list(PREPEND CMAKE_LIBRARY_PATH "${_Z_PINOCCHIO_PREFIX}/lib")
-    list(PREPEND CMAKE_INCLUDE_PATH "${_Z_PINOCCHIO_PREFIX}/include")
-    if(WIN32)
-        list(PREPEND CMAKE_PROGRAM_PATH "${_Z_PINOCCHIO_PREFIX}/bin")
-        list(PREPEND CMAKE_PROGRAM_PATH "${_Z_PINOCCHIO_PREFIX}/tools")
-    endif()
+  # Prepend so our packages take priority over any system ones.
+  list(PREPEND CMAKE_PREFIX_PATH "${_Z_PINOCCHIO_PREFIX}")
+  list(PREPEND CMAKE_LIBRARY_PATH "${_Z_PINOCCHIO_PREFIX}/lib")
+  list(PREPEND CMAKE_INCLUDE_PATH "${_Z_PINOCCHIO_PREFIX}/include")
+  if(WIN32)
+    list(PREPEND CMAKE_PROGRAM_PATH "${_Z_PINOCCHIO_PREFIX}/bin")
+    list(PREPEND CMAKE_PROGRAM_PATH "${_Z_PINOCCHIO_PREFIX}/tools")
+  endif()
 
-    # Let cmake find *.cmake config files in the share/* subdirectories.
-    set(CMAKE_FIND_ROOT_PATH "${_Z_PINOCCHIO_PREFIX}" CACHE PATH
-        "vcpkg root path for pinocchio sub-build" FORCE)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE STRING "" FORCE)
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE STRING "" FORCE)
-    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE STRING "" FORCE)
+  # Let cmake find *.cmake config files in the share/* subdirectories.
+  set(CMAKE_FIND_ROOT_PATH "${_Z_PINOCCHIO_PREFIX}" CACHE PATH "vcpkg root path for pinocchio sub-build" FORCE)
+  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE STRING "" FORCE)
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE STRING "" FORCE)
+  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE STRING "" FORCE)
 
-    # Mark as a vcpkg-aware configure so downstream checks pass.
-    set(VCPKG_TOOLCHAIN ON)
+  # Mark as a vcpkg-aware configure so downstream checks pass.
+  set(VCPKG_TOOLCHAIN ON)
 endif()
