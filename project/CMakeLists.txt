@@ -64,32 +64,28 @@ install(EXPORT CellForge-project-targets
     FILE        project-targets.cmake
 )
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake.in"
-"@PACKAGE_INIT@
+file(
+  WRITE "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake.in"
+  "@PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
 if(NOT TARGET CellForge::project)
   include(\"\${CMAKE_CURRENT_LIST_DIR}/project-targets.cmake\")
 endif()
 ")
 configure_package_config_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-    NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-)
+  "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge" NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake" DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge")
 
 install(
-    DIRECTORY   include/CellForge
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    FILES_MATCHING PATTERN "*.h"
-)
+  DIRECTORY include/CellForge
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING
+  PATTERN "*.h")
 
 # Register with the root umbrella
 set(SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS} "project" PARENT_SCOPE)
 
 if(CELLFORGE_PROJECT_BUILD_TESTS)
-    add_subdirectory(test)
+  add_subdirectory(test)
 endif()
