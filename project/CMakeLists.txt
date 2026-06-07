@@ -33,36 +33,32 @@ set_target_properties(project PROPERTIES OUTPUT_NAME cellforge_project)
 
 target_cxx_version(project PUBLIC VERSION ${CELLFORGE_CXX_VERSION})
 target_compile_options(project PRIVATE ${CELLFORGE_COMPILE_OPTIONS_PRIVATE})
-target_compile_options(project PUBLIC  ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
+target_compile_options(project PUBLIC ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
 target_compile_definitions(project PUBLIC ${CELLFORGE_COMPILE_DEFINITIONS})
 
-target_include_directories(project
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-)
+target_include_directories(project PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                                          $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(project
-    PUBLIC
-        CellForge::core   # IPersistenceBackend, Mathematics.h (Transform, NodeId, DocumentId)
+target_link_libraries(
+  project PUBLIC CellForge::core # IPersistenceBackend, Mathematics.h (Transform, NodeId, DocumentId)
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-install(TARGETS project
-    EXPORT                  CellForge-project-targets
-    RUNTIME_DEPENDENCY_SET  CF_runtime_deps
-    RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"
-    LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-install(EXPORT CellForge-project-targets
-    NAMESPACE   CellForge::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
-    FILE        project-targets.cmake
-)
+install(
+  TARGETS project
+  EXPORT CellForge-project-targets
+  RUNTIME_DEPENDENCY_SET CF_runtime_deps
+  RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(
+  EXPORT CellForge-project-targets
+  NAMESPACE CellForge::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge"
+  FILE project-targets.cmake)
 
 file(
   WRITE "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake.in"
