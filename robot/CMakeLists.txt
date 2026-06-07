@@ -37,24 +37,19 @@ set_target_properties(robot PROPERTIES OUTPUT_NAME cellforge_robot)
 
 target_cxx_version(robot PUBLIC VERSION ${CELLFORGE_CXX_VERSION})
 target_compile_options(robot PRIVATE ${CELLFORGE_COMPILE_OPTIONS_PRIVATE})
-target_compile_options(robot PUBLIC  ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
+target_compile_options(robot PUBLIC ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
 target_compile_definitions(robot PUBLIC ${CELLFORGE_COMPILE_DEFINITIONS})
 
-target_include_directories(robot
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge
-)
+target_include_directories(
+  robot PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge)
 
-target_link_libraries(robot
-  PUBLIC
-    Eigen3::Eigen
-    pinocchio::pinocchio
-    tesseract::tesseract_environment
-    tesseract::tesseract_common
-)
+target_link_libraries(
+  robot
+  PUBLIC Eigen3::Eigen
+         pinocchio::pinocchio
+         tesseract::tesseract_environment
+         tesseract::tesseract_common)
 
 # ─── Install & CMake package export ───────────────────────────────────────────
 include(CMakePackageConfigHelpers)
