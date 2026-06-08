@@ -7,10 +7,10 @@
 # License-Filename: LICENSE
 # ------------------------------------------------------------------------------------
 
-# CMAKE_MFC_FLAG must be set in its own subdirectory so the VS generator applies
-# UseOfMfc=Dynamic only to the targets defined here.  Setting it in the parent
-# directory would propagate it to the Qt library, which doesn't need MFC headers.
-set(CMAKE_MFC_FLAG 2)   # 2 = Use MFC in a Shared DLL
+# CMAKE_MFC_FLAG must be set in its own subdirectory so the VS generator applies UseOfMfc=Dynamic only to the targets
+# defined here.  Setting it in the parent directory would propagate it to the Qt library, which doesn't need MFC
+# headers.
+set(CMAKE_MFC_FLAG 2) # 2 = Use MFC in a Shared DLL
 
 add_library(
   cellforge_platform_mfc SHARED
@@ -41,14 +41,12 @@ target_compile_definitions(
          $<$<CONFIG:MinSizeRel>:CF_DIST>)
 
 target_include_directories(
-  cellforge_platform_mfc
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include> $<INSTALL_INTERFACE:include>
+  cellforge_platform_mfc PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include> $<INSTALL_INTERFACE:include>
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include/CellForge)
 
 target_link_libraries(
   cellforge_platform_mfc
-  PUBLIC CellForge::core
-         CellForge::viewer # IViewerWidget.h is a public header dep
+  PUBLIC CellForge::core CellForge::viewer # IViewerWidget.h is a public header dep
   PRIVATE TKernel # Standard_*, OSD_*
           TKV3d # AIS_*, PrsMgr_*, SelectMgr_*, V3d_*
           TKService # Aspect_*

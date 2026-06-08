@@ -39,16 +39,12 @@ target_compile_options(workcell PUBLIC ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
 target_compile_definitions(workcell PUBLIC ${CELLFORGE_COMPILE_DEFINITIONS})
 
 target_include_directories(
-  workcell
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
-         $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge)
+  workcell PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+                  $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}> PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge)
 
 target_link_libraries(
-  workcell
-  PUBLIC flecs::flecs
-         TKernel # Standard_* types required by gp_*
-         TKMath # gp_Trsf, gp_Dir, gp_Pnt, gp_Vec
+  workcell PUBLIC flecs::flecs TKernel # Standard_* types required by gp_*
+                  TKMath # gp_Trsf, gp_Dir, gp_Pnt, gp_Vec
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────
