@@ -11,10 +11,13 @@ find_package(Catch2 3 REQUIRED)
 include(Catch)
 
 add_executable(
-  cellforge_persistence_tests test_document.cpp test_nodes.cpp test_attributes.cpp test_undo_redo.cpp)
+  cellforge_persistence_tests
+  test_document.cpp
+  test_nodes.cpp
+  test_attributes.cpp
+  test_undo_redo.cpp)
 
-target_link_libraries(
-  cellforge_persistence_tests PRIVATE CellForge::persistence Catch2::Catch2WithMain)
+target_link_libraries(cellforge_persistence_tests PRIVATE CellForge::persistence Catch2::Catch2WithMain)
 
 target_compile_features(cellforge_persistence_tests PRIVATE cxx_std_20)
 target_compile_options(cellforge_persistence_tests PRIVATE ${CELLFORGE_COMPILE_OPTIONS_PRIVATE})

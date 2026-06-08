@@ -8,8 +8,7 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   else()
     message(
       FATAL_ERROR
-        "vcpkg not found.\n"
-        "  Option 1: -DCMAKE_TOOLCHAIN_FILE=<vcpkg_root>/scripts/buildsystems/vcpkg.cmake\n"
+        "vcpkg not found.\n" "  Option 1: -DCMAKE_TOOLCHAIN_FILE=<vcpkg_root>/scripts/buildsystems/vcpkg.cmake\n"
         "  Option 2: set the VCPKG_ROOT environment variable")
   endif()
 endif()

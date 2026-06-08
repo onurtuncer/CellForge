@@ -58,8 +58,8 @@ target_link_libraries(
 )
 
 # ─── Install & CMake package export ───────────────────────────────────────────
-# All CellForge component configs install to lib/cmake/CellForge/ so the root
-# umbrella configure_package() can include them via a single relative path.
+# All CellForge component configs install to lib/cmake/CellForge/ so the root umbrella configure_package() can include
+# them via a single relative path.
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
@@ -89,8 +89,7 @@ endif()
 configure_package_config_file(
   "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge" NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/viewer-config.cmake" DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CellForge")
 
 install(
   DIRECTORY include/CellForge

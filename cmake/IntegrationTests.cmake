@@ -4,12 +4,12 @@ if(NOT CELLFORGE_BUILD_TESTS)
   return()
 endif()
 
-# Test project builds as a separate ExternalProject so it can consume the
-# installed tesseract packages from VENDOR_INSTALL_PREFIX via find_package().
-# It deliberately skips the install step — test binaries stay in the build tree.
+# Test project builds as a separate ExternalProject so it can consume the installed tesseract packages from
+# VENDOR_INSTALL_PREFIX via find_package(). It deliberately skips the install step — test binaries stay in the build
+# tree.
 #
-# _VENDOR_ARGS and VENDOR_INSTALL_PREFIX are defined in VendorDependencies.cmake,
-# which is included before this file in the top-level CMakeLists.txt.
+# _VENDOR_ARGS and VENDOR_INSTALL_PREFIX are defined in VendorDependencies.cmake, which is included before this file in
+# the top-level CMakeLists.txt.
 
 set(_TESTS_BUILD_DIR "${CMAKE_BINARY_DIR}/tests_build")
 

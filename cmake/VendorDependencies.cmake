@@ -1,12 +1,10 @@
 include(ExternalProject)
 
-# VENDOR_INSTALL_PREFIX is set by the root CMakeLists.txt before this file
-# is included.  It is not re-declared here to keep ownership unambiguous.
+# VENDOR_INSTALL_PREFIX is set by the root CMakeLists.txt before this file is included.  It is not re-declared here to
+# keep ownership unambiguous.
 
-# Arguments forwarded to every sub-build.
-# ExternalProject_Add inherits the generator/platform/toolset automatically;
-# we only need to forward cache variables.
-# VCPKG_MANIFEST_MODE=OFF: sub-projects have no vcpkg.json so we explicitly
+# Arguments forwarded to every sub-build. ExternalProject_Add inherits the generator/platform/toolset automatically; we
+# only need to forward cache variables. VCPKG_MANIFEST_MODE=OFF: sub-projects have no vcpkg.json so we explicitly
 # disable manifest mode to avoid vcpkg trying (and failing) to run an install.
 set(_VENDOR_ARGS
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
@@ -23,7 +21,7 @@ set(_VENDOR_ARGS
     "-DENABLE_TESTING=OFF"
     "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON")
 
-# 1. ros_industrial_cmake_boilerplate ─────────────────────────────────────────
+# ─── 1. ros_industrial_cmake_boilerplate ──────────────────────────────────────
 # Must come first — every other vendor package calls its macros before project().
 ExternalProject_Add(
   vendor_ricb
@@ -33,7 +31,7 @@ ExternalProject_Add(
   BUILD_ALWAYS OFF
   UPDATE_DISCONNECTED ON)
 
-# 2. opw_kinematics (header-only IK solver) ───────────────────────────────────
+# ─── 2. opw_kinematics (header-only IK solver) ────────────────────────────────
 ExternalProject_Add(
   vendor_opw
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/opw_kinematics"
@@ -43,7 +41,7 @@ ExternalProject_Add(
   UPDATE_DISCONNECTED ON
   DEPENDS vendor_ricb)
 
-# 3. boost_plugin_loader ──────────────────────────────────────────────────────
+# ─── 3. boost_plugin_loader ────────────────────────────────────────────────────
 ExternalProject_Add(
   vendor_boost_plugin_loader
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/boost_plugin_loader"
@@ -53,19 +51,16 @@ ExternalProject_Add(
   UPDATE_DISCONNECTED ON
   DEPENDS vendor_ricb)
 
-# 5. pinocchio ────────────────────────────────────────────────────────────────
-# Use Ninja so each TU gets its own cl.exe invocation. MSBuild batches all 30
-# template-heavy TUs into one process which causes multi-hour optimizer hangs.
-# MSVC /wd4716 /EHsc are Windows-only; GCC treats them as file paths on Linux.
+# ─── 4. pinocchio ──────────────────────────────────────────────────────────────
+# Use Ninja so each TU gets its own cl.exe invocation. MSBuild batches all 30 template-heavy TUs into one process which
+# causes multi-hour optimizer hangs. MSVC /wd4716 /EHsc are Windows-only; GCC treats them as file paths on Linux.
 if(WIN32)
-  # Use clang-cl for pinocchio: MSVC's optimizer hangs for hours on
-  # admm-solver.cpp's deeply-instantiated Eigen templates; clang handles
-  # the same code in seconds while still producing MSVC-ABI-compatible
-  # objects that link cleanly against the rest of the MSVC build.
+  # Use clang-cl for pinocchio: MSVC's optimizer hangs for hours on admm-solver.cpp's deeply-instantiated Eigen
+  # templates; clang handles the same code in seconds while still producing MSVC-ABI-compatible objects that link
+  # cleanly against the rest of the MSVC build.
   #
-  # Locate clang-cl from the active VS installation.
-  # VCINSTALLDIR is exported by vcvarsall.bat / Developer PowerShell for every
-  # VS edition and version; clang-cl lives at Tools/Llvm/x64/bin/ inside it.
+  # Locate clang-cl from the active VS installation. VCINSTALLDIR is exported by vcvarsall.bat / Developer PowerShell
+  # for every VS edition and version; clang-cl lives at Tools/Llvm/x64/bin/ inside it.
   if(DEFINED ENV{VCINSTALLDIR})
     file(TO_CMAKE_PATH "$ENV{VCINSTALLDIR}" _vcinstall)
     set(_clangcl "${_vcinstall}/Tools/Llvm/x64/bin/clang-cl.exe")
@@ -91,12 +86,11 @@ ExternalProject_Add(
   CMAKE_GENERATOR "Ninja"
   LIST_SEPARATOR "|"
   CMAKE_ARGS ${_VENDOR_ARGS}
-             # pinocchio 4.x uses jrl-cmakemodules which redefines find_package,
-             # add_executable, and add_library.  vcpkg.cmake overrides the same three
-             # commands; jrl's later redefinitions then alias _<cmd> back to vcpkg's
-             # own function/macro, causing 1000-level infinite recursion in all three.
-             # Fix: supply a custom toolchain (last -D wins) that sets up the vcpkg
-             # prefix path directly without including vcpkg.cmake at all.
+             # pinocchio 4.x uses jrl-cmakemodules which redefines find_package, add_executable, and add_library.
+             # vcpkg.cmake overrides the same three commands; jrl's later redefinitions then alias _<cmd> back to
+             # vcpkg's own function/macro, causing 1000-level infinite recursion in all three. Fix: supply a custom
+             # toolchain (last -D wins) that sets up the vcpkg prefix path directly without including vcpkg.cmake at
+             # all.
              "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/cmake/pinocchio_toolchain.cmake"
              "-DVCPKG_INSTALLED_DIR=${VCPKG_INSTALLED_DIR}"
              "-DCMAKE_PREFIX_PATH=${VENDOR_INSTALL_PREFIX}|${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
@@ -114,7 +108,7 @@ ExternalProject_Add(
   BUILD_ALWAYS OFF
   UPDATE_DISCONNECTED ON)
 
-# 4. tesseract ─────────────────────────────────────────────────────────────────
+# ─── 5. tesseract ──────────────────────────────────────────────────────────────
 ExternalProject_Add(
   vendor_tesseract
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/tesseract"

@@ -24,9 +24,8 @@ file(MAKE_DIRECTORY "${VENDOR_INSTALL_PREFIX}")
 list(PREPEND CMAKE_PREFIX_PATH "${VENDOR_INSTALL_PREFIX}")
 
 # ─── Bootstrap: ros_industrial_cmake_boilerplate ──────────────────────────────
-# RICB supplies extract_package_metadata(), configure_component(), and
-# configure_package() — all called before or shortly after project().
-# It contains no compiled code, so the first-run build takes only a few seconds.
+# RICB supplies extract_package_metadata(), configure_component(), and configure_package() — all called before or
+# shortly after project(). It contains no compiled code, so the first-run build takes only a few seconds.
 find_package(ros_industrial_cmake_boilerplate QUIET)
 if(NOT ros_industrial_cmake_boilerplate_FOUND)
   message(STATUS "CellForge: bootstrapping ros_industrial_cmake_boilerplate (first configure only)…")
@@ -63,21 +62,19 @@ cellforge_variables()
 include(cmake/VendorDependencies.cmake)
 
 # ─── CellForge first-party components ────────────────────────────────────────
-# Each add_subdirectory appends its component name to SUPPORTED_COMPONENTS
-# via set(SUPPORTED_COMPONENTS ... PARENT_SCOPE), exactly like tesseract.
+# Each add_subdirectory appends its component name to SUPPORTED_COMPONENTS via set(SUPPORTED_COMPONENTS ...
+# PARENT_SCOPE), exactly like tesseract.
 set(SUPPORTED_COMPONENTS "")
 
 include(cmake/CellForgeComponents.cmake)
 
 # ─── Runtime dependency bundling ──────────────────────────────────────────────
-# Resolves the transitive DLL closure of every CellForge target and installs
-# only the DLLs that are actually needed (not the full vcpkg/vendor bin dirs).
-# The two DIRECTORIES entries tell the resolver where to look:
-#   • vcpkg bin — Qt6, OCCT, Boost, spdlog, yaml-cpp, flecs, Tracy, …
-#   • vendor_install bin — Tesseract, boost_plugin_loader, …
+# Resolves the transitive DLL closure of every CellForge target and installs only the DLLs that are actually needed (not
+# the full vcpkg/vendor bin dirs). The two DIRECTORIES entries tell the resolver where to look: • vcpkg bin — Qt6, OCCT,
+# Boost, spdlog, yaml-cpp, flecs, Tracy, … • vendor_install bin — Tesseract, boost_plugin_loader, …
 if(WIN32)
-  # vcpkg sets VCPKG_INSTALLED_DIR in manifest mode; fall back to the
-  # conventional in-source location when invoking component sub-builds.
+  # vcpkg sets VCPKG_INSTALLED_DIR in manifest mode; fall back to the conventional in-source location when invoking
+  # component sub-builds.
   if(NOT DEFINED VCPKG_INSTALLED_DIR)
     set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_installed")
   endif()
@@ -108,19 +105,17 @@ if(WIN32)
 endif()
 
 # ─── Umbrella package config ──────────────────────────────────────────────────
-# Generates lib/cmake/CellForge/CellForge-config.cmake so consumers can:
-#   find_package(CellForge REQUIRED COMPONENTS viewer)
-#   target_link_libraries(myapp PRIVATE CellForge::viewer)
+# Generates lib/cmake/CellForge/CellForge-config.cmake so consumers can: find_package(CellForge REQUIRED COMPONENTS
+# viewer) target_link_libraries(myapp PRIVATE CellForge::viewer)
 #
 # configure_package() (from RICB) generates an umbrella config that includes
-# ${CMAKE_CURRENT_LIST_DIR}/${component}-config.cmake for each component.
-# Each component installs its own config to lib/cmake/CellForge/ so the
-# relative include resolves correctly.
+# ${CMAKE_CURRENT_LIST_DIR}/${component}-config.cmake for each component. Each component installs its own config to
+# lib/cmake/CellForge/ so the relative include resolves correctly.
 configure_package(COMPONENT CellForge SUPPORTED_COMPONENTS ${SUPPORTED_COMPONENTS})
 
 # ─── Version file ─────────────────────────────────────────────────────────────
-# RICB's configure_package() writes ExactVersion; override with SameMajorVersion
-# so consumers can do find_package(CellForge 0.1) and get any 0.x release.
+# RICB's configure_package() writes ExactVersion; override with SameMajorVersion so consumers can do
+# find_package(CellForge 0.1) and get any 0.x release.
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_BINARY_DIR}/CellForge-config-version.cmake" VERSION "${PROJECT_VERSION}"
                                  COMPATIBILITY SameMajorVersion)
@@ -138,9 +133,8 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 
 if(WIN32)
   set(CPACK_GENERATOR "WIX")
-  # Stable product GUID — must NOT change between releases so WiX can match
-  # an existing installation and perform an in-place upgrade instead of a
-  # parallel install.  Regenerate only when intentionally breaking upgrades.
+  # Stable product GUID — must NOT change between releases so WiX can match an existing installation and perform an
+  # in-place upgrade instead of a parallel install.  Regenerate only when intentionally breaking upgrades.
   set(CPACK_WIX_UPGRADE_GUID "6E5D4C3B-2A19-4870-B6F5-E4D3C2B1A091")
 else()
   set(CPACK_GENERATOR "TGZ")

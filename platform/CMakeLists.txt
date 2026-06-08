@@ -48,8 +48,7 @@ elseif(UNIX)
 endif()
 
 target_include_directories(
-  cellforge_platform_qt
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+  cellforge_platform_qt PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge ${OpenCASCADE_INCLUDE_DIR})
 
 target_link_libraries(
@@ -62,8 +61,8 @@ target_link_libraries(
 )
 
 # ─── MFC platform library (Windows only) ─────────────────────────────────────
-# Lives in its own subdirectory so CMAKE_MFC_FLAG=2 (UseOfMfc=Dynamic) is scoped
-# only to the MFC targets and does not affect the Qt library above.
+# Lives in its own subdirectory so CMAKE_MFC_FLAG=2 (UseOfMfc=Dynamic) is scoped only to the MFC targets and does not
+# affect the Qt library above.
 if(WIN32)
   add_subdirectory(mfc)
 endif()

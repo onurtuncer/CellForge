@@ -38,11 +38,9 @@ target_compile_options(persistence PUBLIC ${CELLFORGE_COMPILE_OPTIONS_PUBLIC})
 target_compile_definitions(persistence PUBLIC ${CELLFORGE_COMPILE_DEFINITIONS})
 
 target_include_directories(
-  persistence
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+  persistence PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
   PRIVATE # OCCT headers are private — consumers never see them through this library.
-          ${OpenCASCADE_INCLUDE_DIR}
-          ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge)
+          ${OpenCASCADE_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include/CellForge)
 
 target_link_libraries(
   persistence

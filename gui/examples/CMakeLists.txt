@@ -37,8 +37,7 @@ if(WIN32)
   get_filename_component(_qt6_bin "${_qt6_dll}" DIRECTORY)
   get_filename_component(_qt6_root "${_qt6_bin}" DIRECTORY)
 
-  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
-       CONTENT "[Paths]\nPlugins = ${_qt6_root}/Qt6/plugins\n")
+  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qt.conf" CONTENT "[Paths]\nPlugins = ${_qt6_root}/Qt6/plugins\n")
   add_custom_command(
     TARGET cellforge_viewer_example
     POST_BUILD
@@ -57,8 +56,7 @@ if(WIN32)
   add_custom_command(
     TARGET cellforge_viewer_example
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_vcpkg_bin_dlls}
-            "$<TARGET_FILE_DIR:cellforge_viewer_example>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_vcpkg_bin_dlls} "$<TARGET_FILE_DIR:cellforge_viewer_example>"
     COMMENT "Deploying vcpkg runtime DLLs")
 endif()
 

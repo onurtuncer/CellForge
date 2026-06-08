@@ -33,10 +33,9 @@ if(WIN32)
   get_filename_component(_qt6_bin "${_qt6_dll}" DIRECTORY) # .../bin
   get_filename_component(_qt6_root "${_qt6_bin}" DIRECTORY) # .../<prefix>
 
-  # qt.conf tells Qt where to find its platform plugin (qwindows.dll) without requiring QT_PLUGIN_PATH to be set in
-  # the environment.
-  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
-       CONTENT "[Paths]\nPlugins = ${_qt6_root}/Qt6/plugins\n")
+  # qt.conf tells Qt where to find its platform plugin (qwindows.dll) without requiring QT_PLUGIN_PATH to be set in the
+  # environment.
+  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qt.conf" CONTENT "[Paths]\nPlugins = ${_qt6_root}/Qt6/plugins\n")
   add_custom_command(
     TARGET example_event_log
     POST_BUILD
@@ -48,12 +47,12 @@ if(WIN32)
   add_custom_command(
     TARGET example_event_log
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:cellforge_core>"
-            "$<TARGET_FILE:cellforge_platform_qt>" "$<TARGET_FILE_DIR:example_event_log>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:cellforge_core>" "$<TARGET_FILE:cellforge_platform_qt>"
+            "$<TARGET_FILE_DIR:example_event_log>"
     COMMENT "Deploying CellForge DLLs")
 
-  # Qt DLLs and their dependencies (ICU, pcre2, freetype, etc.) live in the same bin directory as Qt6Core.dll — copy
-  # the whole set.
+  # Qt DLLs and their dependencies (ICU, pcre2, freetype, etc.) live in the same bin directory as Qt6Core.dll — copy the
+  # whole set.
   file(GLOB _qt_bin_dlls "${_qt6_bin}/*.dll")
   add_custom_command(
     TARGET example_event_log
