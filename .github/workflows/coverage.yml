@@ -57,6 +57,8 @@ jobs:
         cache-key: cellforge-vcpkg-ubuntu-latest-coverage-v3
 
     - name: Configure (GCC Debug + coverage flags)
+      env:
+        VCPKG_ROOT: ${{ github.workspace }}/vcpkg
       run: cmake --preset=gcc-debug
 
     - name: Build
