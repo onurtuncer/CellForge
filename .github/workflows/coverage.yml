@@ -59,7 +59,7 @@ jobs:
     - name: Configure (GCC Debug + coverage flags)
       env:
         VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-      run: cmake --preset=gcc-debug
+      run: cmake --preset=gcc-debug -DVCPKG_MANIFEST_MODE=OFF
 
     - name: Build
       run: cmake --build --preset=gcc-debug
