@@ -18,7 +18,12 @@ add_executable(cellforge_viewer_example main.cpp)
 
 target_compile_features(cellforge_viewer_example PRIVATE cxx_std_20)
 
-target_compile_definitions(cellforge_viewer_example PRIVATE CF_PLATFORM_WINDOWS)
+# Base.h requires one of these to be defined — detect from CMake platform vars.
+if(WIN32)
+  target_compile_definitions(cellforge_viewer_example PRIVATE CF_PLATFORM_WINDOWS)
+elseif(UNIX)
+  target_compile_definitions(cellforge_viewer_example PRIVATE CF_PLATFORM_LINUX)
+endif()
 
 target_link_libraries(
   cellforge_viewer_example
