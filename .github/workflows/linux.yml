@@ -67,5 +67,10 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      # Add tesseract and vcpkg shared library directories to the loader search path before running tests — the test
+      # binaries are not installed (and so carry no RPATH to these locations), so the dynamic linker cannot otherwise
+      # find libtesseract_*.so / vcpkg .so dependencies at runtime.
       - name: Test
-        run: ctest --test-dir build/tests_build --output-on-failure -C Release
+        run: |
+          export LD_LIBRARY_PATH="${{ github.workspace }}/build/vendor_install/lib:${{ github.workspace }}/vcpkg/installed/x64-linux-release/lib:$LD_LIBRARY_PATH"
+          ctest --test-dir build/tests_build --output-on-failure -C Release
