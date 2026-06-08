@@ -62,7 +62,7 @@ jobs:
       run: cmake --preset=gcc-debug -DVCPKG_MANIFEST_MODE=OFF
 
     - name: Build
-      run: cmake --build --preset=gcc-debug
+      run: cmake --build --preset=gcc-debug --parallel 2
 
     - name: Run tests
       run: ctest --preset=gcc-test
