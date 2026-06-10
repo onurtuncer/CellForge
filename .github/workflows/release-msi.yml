@@ -1,0 +1,103 @@
+name: Release MSI
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Package MSI (MSVC 2022 x64 Release)
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # The pushed tag (vX.Y.Z) must match package.xml's <version>, otherwise WiX
+      # would build an MSI advertising a version that doesn't match the source tree.
+      - name: Verify tag matches package.xml version
+        shell: pwsh
+        run: |
+          $tagVersion = "${{ github.ref_name }}" -replace '^v', ''
+          [xml]$pkg = Get-Content package.xml
+          $pkgVersion = $pkg.package.version
+          if ($tagVersion -ne $pkgVersion) {
+            throw "Tag version 'v$tagVersion' does not match package.xml version '$pkgVersion'"
+          }
+          Write-Host "Tag version $tagVersion matches package.xml"
+
+      # Install in classic mode (--classic) so vcpkg ignores the builtin-baseline
+      # in vcpkg.json and avoids shallow-clone git-show failures on the CI runner.
+      - name: Install vcpkg dependencies
+        uses: johnwason/vcpkg-action@v8
+        with:
+          pkgs: >-
+            fcl bullet3[multithreading,double-precision,rtti] octomap console-bridge
+            eigen3 yaml-cpp benchmark tinyxml2 assimp orocos-kdl pcl lapack-reference
+            cereal boost-dll boost-filesystem boost-program-options boost-graph
+            boost-stacktrace boost-logic urdfdom ccd[double-precision] gtest catch2
+            spdlog tracy flecs opencascade qtbase
+          triplet: x64-windows-release
+          extra-args: --classic --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
+          token: ${{ github.token }}
+          revision: '8528134bac3d39db8d36f4097755a97a1394e4dc'
+          cache-key: cellforge-vcpkg-windows-2022-v4
+
+      # Put cl.exe / nmake.exe / ninja.exe on PATH
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # WiX Toolset v3 (candle.exe/light.exe) is required by CPack's WIX generator.
+      - name: Ensure WiX Toolset is available
+        shell: pwsh
+        run: |
+          if (-not (Get-Command candle.exe -ErrorAction SilentlyContinue)) {
+            choco install wixtoolset -y --no-progress
+          }
+          $wixBin = (Get-ChildItem "C:\Program Files (x86)\WiX Toolset*\bin" -ErrorAction SilentlyContinue |
+                     Select-Object -First 1).FullName
+          if ($wixBin) {
+            echo $wixBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -B build -G "Ninja" `
+            -DCMAKE_BUILD_TYPE=Release `
+            "-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows-release `
+            "-DVCPKG_OVERLAY_TRIPLETS=${{ github.workspace }}\cmake\triplets" `
+            -DVCPKG_MANIFEST_MODE=OFF
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build build --config Release
+
+      - name: Package MSI
+        shell: pwsh
+        run: |
+          cpack --config build/CPackConfig.cmake -G WIX -C Release -B build/package
+
+      - name: Locate MSI
+        id: msi
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem -Path build/package -Filter *.msi -Recurse | Select-Object -First 1
+          if (-not $msi) {
+            throw "No .msi file produced by cpack"
+          }
+          echo "path=$($msi.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.msi.outputs.path }}
+          generate_release_notes: true
