@@ -105,9 +105,9 @@ ExternalProject_Add(
              "-DINSTALL_DOCUMENTATION=OFF"
              "-DGENERATE_PYTHON_STUBS=OFF"
              "-DBUILD_ADVANCED_TESTING=OFF"
-  # pinocchio's Ninja sub-build is invoked separately from the top-level --parallel cap and defaults to using all
-  # cores. Its template-heavy TUs (e.g. admm-solver.cpp, mjcf-graph.cpp) compiled with debug/coverage flags can each
-  # use several GB of RAM, OOM-killing the runner when built in parallel. Force it to build serially.
+  # pinocchio's Ninja sub-build is invoked separately from the top-level --parallel cap and defaults to using all cores.
+  # Its template-heavy TUs (e.g. admm-solver.cpp, mjcf-graph.cpp) compiled with debug/coverage flags can each use
+  # several GB of RAM, OOM-killing the runner when built in parallel. Force it to build serially.
   BUILD_COMMAND ${CMAKE_COMMAND} --build . --parallel 1
   BUILD_ALWAYS OFF
   UPDATE_DISCONNECTED ON)
