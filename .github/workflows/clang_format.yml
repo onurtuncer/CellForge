@@ -8,7 +8,7 @@ on:
     paths:
       - 'core/**'
       - 'workcell/**'
-      - 'gui/**'
+      - 'viewer/**'
       - 'platform/**'
       - 'persistence/**'
       - 'project/**'

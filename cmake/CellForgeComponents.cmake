@@ -32,7 +32,7 @@ if(CELLFORGE_BUILD_WORKCELL)
 endif()
 
 if(CELLFORGE_BUILD_VIEWER)
-  add_subdirectory(gui)
+  add_subdirectory(viewer)
 endif()
 
 # platform must come after core (depends on CellForge::core target)

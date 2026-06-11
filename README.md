@@ -42,7 +42,7 @@ CellForge provides a platform-agnostic core with typed events, an ECS-based work
 |---|---|---|
 | `core/` | `CellForge::core` | Application lifecycle, typed event system, ECS (flecs), logging (spdlog), Tracy profiling, memory tracking |
 | `workcell/` | `CellForge::workcell` | ECS-based robot cell model — entities, components, scene loading/querying (flecs + OpenCASCADE) |
-| `gui/` | `CellForge::viewer` | Interactive 3D viewer widget (Qt 6 + OpenCASCADE OCCT) |
+| `viewer/` | `CellForge::viewer` | Interactive 3D viewer widget (Qt 6 + OpenCASCADE OCCT) |
 | `platform/` | `CellForge::platform_qt` | Qt 6 platform backend — `QtApplicationPlatform`, `ViewportWidget`, key/mouse event mapper |
 | `platform/` | `CellForge::platform_mfc` | Win32 / MFC platform backend — `MfcApplicationPlatform`, `MfcViewportWnd`, VK key mapper *(requires VS MFC component)* |
 | `persistence/` | `CellForge::persistence` | OCAF document persistence backend |
@@ -111,7 +111,7 @@ CellForge/
 │   │   └── Debug/Profiler.h    # Tracy integration macros
 │   └── src/
 ├── workcell/                   # CellForge::workcell — ECS robot cell
-├── gui/                        # CellForge::viewer — Qt6 + OCCT 3D viewer
+├── viewer/                     # CellForge::viewer — Qt6 + OCCT 3D viewer
 ├── persistence/                # CellForge::persistence — OCAF document backend
 ├── project/                    # CellForge::project — offline programming model
 ├── platform/                   # Platform backends

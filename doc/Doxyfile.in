@@ -780,7 +780,7 @@ WARN_LOGFILE           =
 
 INPUT                  = @CMAKE_SOURCE_DIR@/core \
                          @CMAKE_SOURCE_DIR@/workcell \
-                         @CMAKE_SOURCE_DIR@/gui \
+                         @CMAKE_SOURCE_DIR@/viewer \
                          @CMAKE_SOURCE_DIR@/platform
 
 # This tag can be used to specify the character encoding of the source files

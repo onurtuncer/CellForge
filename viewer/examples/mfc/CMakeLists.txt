@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(cellforge_viewer_mfc_example LANGUAGES CXX)
 
-# Cancel CMAKE_AUTOMOC inherited from the parent gui/examples scope — no Qt here.
+# Cancel CMAKE_AUTOMOC inherited from the parent viewer/examples scope — no Qt here.
 set(CMAKE_AUTOMOC OFF)
 
 find_package(OpenCASCADE REQUIRED)

@@ -8,7 +8,7 @@ on:
       - 'core/**'
       - 'persistence/**'
       - 'platform/**'
-      - 'gui/**'
+      - 'viewer/**'
       - 'workcell/**'
       - 'get_project_name.py'
       - 'package.xml'
