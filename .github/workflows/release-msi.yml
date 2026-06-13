@@ -67,6 +67,9 @@ jobs:
             echo $wixBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
 
+      # VCPKG_APPLOCAL_DEPS copies each target's OCCT/Qt DLL dependencies next to its own
+      # binary, giving install(RUNTIME_DEPENDENCY_SET) multiple conflicting on-disk copies
+      # of the same DLL (e.g. TKBRep.dll) to choose from, which fails CPack packaging.
       - name: Configure
         shell: pwsh
         run: |
@@ -75,7 +78,8 @@ jobs:
             "-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows-release `
             "-DVCPKG_OVERLAY_TRIPLETS=${{ github.workspace }}\cmake\triplets" `
-            -DVCPKG_MANIFEST_MODE=OFF
+            -DVCPKG_MANIFEST_MODE=OFF `
+            -DVCPKG_APPLOCAL_DEPS=OFF
 
       - name: Build
         shell: pwsh

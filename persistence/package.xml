@@ -3,7 +3,7 @@
             schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>cellforge_persistence</name>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <description>CellForge OCAF-based document persistence backend</description>
   <maintainer email="contact@cellforge.dev">CellForge</maintainer>
   <license>LGPL-2.1-only</license>
