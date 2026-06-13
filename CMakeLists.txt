@@ -91,6 +91,16 @@ if(WIN32)
     DIRECTORIES
     "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin"
     "${VENDOR_INSTALL_PREFIX}/bin"
+    # First-party CellForge component DLLs (e.g. cellforge_core.dll) are not copied into a
+    # shared output directory, so other components' RUNTIME_DEPENDENCY_SET resolution needs
+    # each component's own build directory to find them.
+    "${CMAKE_BINARY_DIR}/core"
+    "${CMAKE_BINARY_DIR}/workcell"
+    "${CMAKE_BINARY_DIR}/viewer"
+    "${CMAKE_BINARY_DIR}/platform"
+    "${CMAKE_BINARY_DIR}/persistence"
+    "${CMAKE_BINARY_DIR}/project"
+    "${CMAKE_BINARY_DIR}/robot"
     DESTINATION
     "${CMAKE_INSTALL_BINDIR}")
 
