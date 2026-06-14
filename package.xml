@@ -3,7 +3,7 @@
             schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>CellForge</name>
-  <version>0.1.3</version>
+  <version>0.1.4</version>
   <description>CellForge robotics application — OCCT CAD and Tesseract motion planning</description>
   <maintainer email="contact@cellforge.dev">CellForge</maintainer>
   <license>MIT</license>
