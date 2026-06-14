@@ -91,9 +91,8 @@ if(WIN32)
     DIRECTORIES
     "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin"
     "${VENDOR_INSTALL_PREFIX}/bin"
-    # First-party CellForge component DLLs (e.g. cellforge_core.dll) are not copied into a
-    # shared output directory, so other components' RUNTIME_DEPENDENCY_SET resolution needs
-    # each component's own build directory to find them.
+    # First-party CellForge component DLLs (e.g. cellforge_core.dll) are not copied into a shared output directory, so
+    # other components' RUNTIME_DEPENDENCY_SET resolution needs each component's own build directory to find them.
     "${CMAKE_BINARY_DIR}/core"
     "${CMAKE_BINARY_DIR}/workcell"
     "${CMAKE_BINARY_DIR}/viewer"
@@ -115,9 +114,8 @@ if(WIN32)
 endif()
 
 # ─── Documentation (Doxygen + Sphinx) ──────────────────────────────────────────
-# Off by default since it requires Doxygen and a Python/Sphinx toolchain (see
-# doc/requirements.txt). When on, the rendered HTML is installed under
-# CMAKE_INSTALL_DOCDIR and bundled into installers (e.g. the WiX MSI).
+# Off by default since it requires Doxygen and a Python/Sphinx toolchain (see doc/requirements.txt). When on, the
+# rendered HTML is installed under CMAKE_INSTALL_DOCDIR and bundled into installers (e.g. the WiX MSI).
 option(CELLFORGE_BUILD_DOCS "Build Doxygen/Sphinx HTML documentation and bundle it in installers" OFF)
 if(CELLFORGE_BUILD_DOCS)
   add_subdirectory(doc)

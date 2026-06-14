@@ -72,7 +72,14 @@ Hints
 include(FindPackageHandleStandardArgs)
 
 # ─── Map component -> on-disk library base name (cellforge_<comp>) ────────────
-set(_CellForge_known_components core workcell viewer platform_qt persistence project robot)
+set(_CellForge_known_components
+    core
+    workcell
+    viewer
+    platform_qt
+    persistence
+    project
+    robot)
 
 if(NOT CellForge_FIND_COMPONENTS)
   set(CellForge_FIND_COMPONENTS ${_CellForge_known_components})
@@ -88,14 +95,17 @@ set(_CellForge_header_project CellForge/Project.h)
 set(_CellForge_header_robot CellForge/RobotModel.h)
 
 # ─── Locate the installation root ──────────────────────────────────────────────
-# WiX (CPACK_PACKAGE_INSTALL_DIRECTORY "CellForge") installs under
-# "<Program Files>/CellForge" by default.
+# WiX (CPACK_PACKAGE_INSTALL_DIRECTORY "CellForge") installs under "<Program Files>/CellForge" by default.
 find_path(
   CellForge_ROOT
   NAMES include/CellForge/Application.h
-  PATHS "$ENV{CellForge_ROOT}" "$ENV{ProgramFiles}/CellForge" "$ENV{ProgramFiles\(x86\)}/CellForge"
-        "C:/Program Files/CellForge" "C:/Program Files (x86)/CellForge"
-  PATH_SUFFIXES "" "." DOC "CellForge MSI installation root")
+  PATHS "$ENV{CellForge_ROOT}"
+        "$ENV{ProgramFiles}/CellForge"
+        "$ENV{ProgramFiles\(x86\)}/CellForge"
+        "C:/Program Files/CellForge"
+        "C:/Program Files (x86)/CellForge"
+  PATH_SUFFIXES "" "."
+  DOC "CellForge MSI installation root")
 
 if(CellForge_ROOT)
   set(CellForge_INCLUDE_DIR "${CellForge_ROOT}/include")
@@ -123,7 +133,10 @@ endif()
 set(_CellForge_required_vars CellForge_INCLUDE_DIR)
 
 foreach(_comp IN LISTS CellForge_FIND_COMPONENTS)
-  if(NOT _comp IN_LIST _CellForge_known_components)
+  if(NOT
+     _comp
+     IN_LIST
+     _CellForge_known_components)
     message(WARNING "FindCellForge: unknown component '${_comp}' (known: ${_CellForge_known_components})")
     continue()
   endif()
@@ -166,17 +179,21 @@ foreach(_comp IN LISTS CellForge_FIND_COMPONENTS)
     if(WIN32)
       add_library(CellForge::${_comp} SHARED IMPORTED)
       set_target_properties(CellForge::${_comp} PROPERTIES IMPORTED_LOCATION "${CellForge_${_comp}_DLL}"
-                                                             IMPORTED_IMPLIB "${CellForge_${_comp}_LIBRARY}")
+                                                           IMPORTED_IMPLIB "${CellForge_${_comp}_LIBRARY}")
     else()
       add_library(CellForge::${_comp} UNKNOWN IMPORTED)
       set_target_properties(CellForge::${_comp} PROPERTIES IMPORTED_LOCATION "${CellForge_${_comp}_LIBRARY}")
     endif()
     set_target_properties(CellForge::${_comp} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-                                                           "${CellForge_${_comp}_INCLUDE_DIR}")
+                                                         "${CellForge_${_comp}_INCLUDE_DIR}")
   endif()
 
   if(CellForge_FIND_REQUIRED_${_comp})
-    list(APPEND _CellForge_required_vars CellForge_${_comp}_INCLUDE_DIR CellForge_${_comp}_LIBRARY)
+    list(
+      APPEND
+      _CellForge_required_vars
+      CellForge_${_comp}_INCLUDE_DIR
+      CellForge_${_comp}_LIBRARY)
     if(WIN32)
       list(APPEND _CellForge_required_vars CellForge_${_comp}_DLL)
     endif()

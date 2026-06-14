@@ -27,7 +27,8 @@ file(MAKE_DIRECTORY "${DOXYGEN_OUTPUT_DIR}")
 
 # Only regenerate Doxygen when the Doxyfile or public headers change.
 file(
-  GLOB_RECURSE PROJECT_PUBLIC_HEADERS
+  GLOB_RECURSE
+  PROJECT_PUBLIC_HEADERS
   "${CMAKE_SOURCE_DIR}/core/include/*.h"
   "${CMAKE_SOURCE_DIR}/workcell/include/*.h"
   "${CMAKE_SOURCE_DIR}/viewer/include/*.h"
