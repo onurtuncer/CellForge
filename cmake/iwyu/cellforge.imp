@@ -1,0 +1,15 @@
+// include-what-you-use mapping file for CellForge.
+//
+// Pulls in the upstream mappings bundled with include-what-you-use for the
+// third-party libraries CellForge links against, so IWYU doesn't suggest
+// swapping public umbrella headers (<boost/...>, <gtest/gtest.h>, ...) for
+// their internal/detail headers. Resolved against IWYU's own mapping
+// directory (typically /usr/share/include-what-you-use on Linux).
+//
+// Extend this file as new false positives are found, e.g.:
+//   { "symbol": ["std::filesystem::path", "private", "<filesystem>", "public"] }
+[
+  { ref: "boost-all.imp" },
+  { ref: "boost-all-private.imp" },
+  { ref: "gtest.imp" }
+]

@@ -1,0 +1,91 @@
+name: IWYU
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  iwyu:
+    name: include-what-you-use (informational)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Same system libraries as the Linux build (Qt6/OCCT/PCL dependencies expect these via
+      # pkg-config / find_package), plus clang + iwyu for the analysis pass below.
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config gfortran clang iwyu \
+            autoconf autoconf-archive automake libtool libltdl-dev \
+            libgl-dev libglu1-mesa-dev libdrm-dev libgbm-dev libegl-dev \
+            libx11-dev libx11-xcb-dev libxext-dev libxrender-dev \
+            libxrandr-dev libxi-dev libxinerama-dev libxcursor-dev libxfixes-dev \
+            libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev \
+            libxcb-icccm4-dev libxcb-image0-dev libxcb-shm0-dev \
+            libxcb-util-dev libxcb-render0-dev libxcb-render-util0-dev \
+            libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev \
+            libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-xkb-dev \
+            libxcb-cursor-dev libxcb-xinput-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev \
+            libfontconfig1-dev libfreetype-dev \
+            libsm-dev libice-dev \
+            libdbus-1-dev
+
+      # Install in classic mode (--classic) so vcpkg ignores the builtin-baseline
+      # in vcpkg.json and avoids shallow-clone git-show failures on the CI runner.
+      - name: Install vcpkg dependencies
+        uses: johnwason/vcpkg-action@v8
+        with:
+          pkgs: >-
+            fcl bullet3[multithreading,double-precision,rtti] octomap console-bridge
+            eigen3 yaml-cpp benchmark tinyxml2 assimp orocos-kdl pcl lapack-reference
+            cereal boost-dll boost-filesystem boost-program-options boost-graph boost-logic
+            boost-stacktrace urdfdom ccd[double-precision] gtest catch2
+            spdlog tracy flecs opencascade qtbase
+          triplet: x64-linux-release
+          extra-args: --classic --clean-after-build --overlay-triplets=${{ github.workspace }}/cmake/triplets
+          token: ${{ github.token }}
+          revision: '8528134bac3d39db8d36f4097755a97a1394e4dc'
+          cache-key: cellforge-vcpkg-ubuntu-24.04-v5
+
+      # Configure only — IWYU is driven from compile_commands.json below, so we don't need a
+      # full build (which would also compile the vendored Tesseract/Pinocchio ExternalProjects).
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            "-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-release \
+            "-DVCPKG_OVERLAY_TRIPLETS=${{ github.workspace }}/cmake/triplets" \
+            -DVCPKG_MANIFEST_MODE=OFF \
+            -DCELLFORGE_BUILD_ROBOT=OFF
+
+      # A full build is needed so that generated headers (e.g. core/include/CellForge/Version.h)
+      # and the vendored ExternalProjects' installed headers exist before IWYU inspects includes.
+      - name: Build
+        run: cmake --build build --config Release
+
+      # Informational only: report IWYU's suggestions for first-party sources without failing
+      # the build. The codebase is not yet IWYU-clean; this surfaces the diff for review.
+      - name: Run include-what-you-use
+        continue-on-error: true
+        run: |
+          iwyu_tool.py -p build core workcell viewer platform persistence project \
+            -- -Xiwyu --mapping_file="${{ github.workspace }}/cmake/iwyu/cellforge.imp" \
+               -Xiwyu --cxx17ns -Xiwyu --no_fwd_decls \
+            | tee iwyu-report.txt
+
+      - name: Upload IWYU report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iwyu-report
+          path: iwyu-report.txt
