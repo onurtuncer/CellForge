@@ -19,6 +19,10 @@ on:
   schedule:
     - cron: '0 5 * * *' # Runs every day at 5:00 AM
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   clang_format:
     runs-on: ubuntu-24.04

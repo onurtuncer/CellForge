@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*.*.*'
 
+# Tags are unique per release, but never cancel an in-progress release build
+# if one is somehow re-triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
