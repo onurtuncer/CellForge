@@ -114,6 +114,15 @@ if(WIN32)
     PATTERN "boost_plugin_loader*.dll")
 endif()
 
+# ─── Documentation (Doxygen + Sphinx) ──────────────────────────────────────────
+# Off by default since it requires Doxygen and a Python/Sphinx toolchain (see
+# doc/requirements.txt). When on, the rendered HTML is installed under
+# CMAKE_INSTALL_DOCDIR and bundled into installers (e.g. the WiX MSI).
+option(CELLFORGE_BUILD_DOCS "Build Doxygen/Sphinx HTML documentation and bundle it in installers" OFF)
+if(CELLFORGE_BUILD_DOCS)
+  add_subdirectory(doc)
+endif()
+
 # ─── Umbrella package config ──────────────────────────────────────────────────
 # Generates lib/cmake/CellForge/CellForge-config.cmake so consumers can: find_package(CellForge REQUIRED COMPONENTS
 # viewer) target_link_libraries(myapp PRIVATE CellForge::viewer)
