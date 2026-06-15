@@ -57,7 +57,7 @@ namespace CellForge {
 			s_GlobalStats.TotalAllocated += size;
 		}
 
-#if HZ_ENABLE_PROFILING
+#if CF_ENABLE_PROFILING
 		TracyAlloc(memory, size);
 #endif
 
@@ -83,7 +83,7 @@ namespace CellForge {
 				s_Data->m_AllocationStatsMap[desc].TotalAllocated += size;
 		}
 
-#if HZ_ENABLE_PROFILING
+#if CF_ENABLE_PROFILING
 		TracyAlloc(memory, size);
 #endif
 
@@ -108,7 +108,7 @@ namespace CellForge {
 			s_Data->m_AllocationStatsMap[file].TotalAllocated += size;
 		}
 
-#if HZ_ENABLE_PROFILING
+#if CF_ENABLE_PROFILING
 		TracyAlloc(memory, size);
 #endif
 
@@ -137,13 +137,13 @@ namespace CellForge {
 				}
 			}
 
-#if HZ_ENABLE_PROFILING
+#if CF_ENABLE_PROFILING
 			TracyFree(memory);
 #endif
 
-#ifndef HZ_DIST
+#ifndef CF_DIST
 			if (!found)
-				HZ_CORE_WARN_TAG("Memory", "Memory block {0} not present in alloc map", memory);
+				CF_CORE_WARN_TAG("Memory", "Memory block {0} not present in alloc map", memory);
 #endif
 		}
 		
@@ -156,7 +156,7 @@ namespace CellForge {
 	}
 }
 
-#if HZ_TRACK_MEMORY && HZ_PLATFORM_WINDOWS
+#if CF_TRACK_MEMORY && CF_PLATFORM_WINDOWS
 
 _NODISCARD _Ret_notnull_ _Post_writable_byte_size_(size) _VCRT_ALLOCATOR
 void* __CRTDECL operator new(size_t size)

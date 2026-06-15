@@ -162,7 +162,7 @@ namespace CellForge {
 		template<typename... Args>
 		static Ref<T> Create(Args&&... args)
 		{
-#if HZ_TRACK_MEMORY && defined(HZ_PLATFORM_WINDOWS)
+#if CF_TRACK_MEMORY && defined(CF_PLATFORM_WINDOWS)
 			return Ref<T>(new(typeid(T).name()) T(std::forward<Args>(args)...));
 #else
 			return Ref<T>(new T(std::forward<Args>(args)...));

@@ -62,7 +62,7 @@ namespace CellForge {
 
 		YAML::Node data = YAML::Load(strStream.str());
 
-		auto settings = data["Hazel Application Settings"];
+		auto settings = data["CellForge Application Settings"];
 		if (!settings)
 			return false;
 

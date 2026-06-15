@@ -13,7 +13,7 @@
 
 #include <atomic>
 
-namespace Hazel {
+namespace CellForge {
 
 	//struct RenderThreadData;
 

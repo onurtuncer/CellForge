@@ -168,12 +168,10 @@ TEST_CASE("ApplicationSettings: SetInt overwrites a previous int value", "[setti
 
 // ─── Serialize / Deserialize round-trip ───────────────────────────────────────
 // NOTE: These tests document the INTENDED behavior.
-// Two bugs currently prevent them from passing:
-//   1. Serialize writes "CellForge Application Settings" but Deserialize reads
-//      "Hazel Application Settings" — key mismatch from an incomplete rename.
-//   2. Serialize emits YAML::EndSeq instead of YAML::EndMap, producing
-//      malformed YAML output.
-// Once both are fixed these tests should pass without modification.
+// One bug currently prevents them from passing:
+//   Serialize emits YAML::EndSeq instead of YAML::EndMap, producing
+//   malformed YAML output.
+// Once fixed these tests should pass without modification.
 
 TEST_CASE("ApplicationSettings: round-trip preserves string value", "[settings][roundtrip]") {
     TempFile tmp("cf_settings_rt_str.yaml");

@@ -13,7 +13,7 @@
 
 #include "PreCompiledHeader.h"
 
-namespace Hazel {
+namespace CellForge {
 
 	struct ControllerButtonData
 	{

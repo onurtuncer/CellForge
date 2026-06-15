@@ -18,8 +18,8 @@
 
 #if CF_ENABLE_PROFILING
 #define CF_PROFILE_MARK_FRAME			FrameMark;
-// NOTE(Peter): Use HZ_PROFILE_FUNC ONLY at the top of a function
-//				Use HZ_PROFILE_SCOPE / HZ_PROFILE_SCOPE_DYNAMIC for an inner scope
+// NOTE(Peter): Use CF_PROFILE_FUNC ONLY at the top of a function
+//				Use CF_PROFILE_SCOPE / CF_PROFILE_SCOPE_DYNAMIC for an inner scope
 #define CF_PROFILE_FUNC(...)			ZoneScoped##__VA_OPT__(N(__VA_ARGS__))
 #define CF_PROFILE_SCOPE(...)			CF_PROFILE_FUNC(__VA_ARGS__)
 #define CF_PROFILE_SCOPE_DYNAMIC(NAME)  ZoneScoped; ZoneName(NAME, strlen(NAME))
