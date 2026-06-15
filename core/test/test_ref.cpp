@@ -11,8 +11,7 @@
 
 #include <CellForge/Ref.h>
 
-// Ref.h currently lives in the Hazel namespace (pending rename).
-using namespace Hazel;
+using namespace CellForge;
 
 // ─── Test fixtures ────────────────────────────────────────────────────────────
 
