@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "CellForge/ECS/Entity.h"
+#include "CellForge/ecs/Entity.h"
 
 #include <flecs.h>
 
