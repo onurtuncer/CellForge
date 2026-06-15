@@ -82,7 +82,10 @@ jobs:
       - name: Run include-what-you-use
         continue-on-error: true
         run: |
-          iwyu_tool.py -p build core workcell viewer platform persistence project \
+          # Debian/Ubuntu's iwyu package ships the python helper as `iwyu-tool`
+          # rather than upstream's `iwyu_tool.py`.
+          IWYU_TOOL="$(command -v iwyu-tool || command -v iwyu_tool.py)"
+          "$IWYU_TOOL" -p build core workcell viewer platform persistence project \
             -- -Xiwyu --mapping_file="${{ github.workspace }}/cmake/iwyu/cellforge.imp" \
                -Xiwyu --cxx17ns -Xiwyu --no_fwd_decls \
             | tee iwyu-report.txt
