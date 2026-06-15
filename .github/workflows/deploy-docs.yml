@@ -99,7 +99,7 @@ jobs:
           echo "Sphinx output pages: $(find build/sphinx -name '*.html' | wc -l)"
 
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/sphinx
 
