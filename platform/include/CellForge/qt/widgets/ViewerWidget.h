@@ -12,9 +12,15 @@
 #include <CellForge/Event/Event.h>
 #include <CellForge/IViewerWidget.h>
 
+#include <AIS_DisplayMode.hxx>
+#include <Quantity_Color.hxx>
+#include <TopoDS_Shape.hxx>
+
 #include <QElapsedTimer>
 #include <QWidget>
+
 #include <functional>
+#include <vector>
 
 class QPaintEvent;
 class QResizeEvent;

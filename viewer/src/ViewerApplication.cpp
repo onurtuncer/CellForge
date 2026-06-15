@@ -8,11 +8,17 @@
 // ------------------------------------------------------------------------------------
 
 #include "ViewerApplication.h"
+#include "IViewerWidget.h"
 
 #include <CellForge/Log.h>
+#include <CellForge/Event/Event.h>
 #include <CellForge/Event/EventDispatcher.h>
 #include <CellForge/Event/MouseEvents.h>
 #include <CellForge/Event/ApplicationEvent.h>
+#include <CellForge/IWindow.h>
+
+#include <format>
+#include <functional>
 
 namespace CellForge {
 

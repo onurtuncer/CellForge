@@ -9,6 +9,9 @@
 
 #include "CellForge/Project.h"
 
+#include <cstdint>
+#include <initializer_list>
+
 namespace CellForge {
 
 // ─── Attribute key / item-type constants ─────────────────────────────────────

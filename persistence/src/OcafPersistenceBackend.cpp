@@ -15,8 +15,12 @@
 // ── OCAF framework ────────────────────────────────────────────────────────────
 #include <BinDrivers.hxx>
 #include <Message_ProgressRange.hxx>
+#include <NCollection_DataMap.hxx>
 #include <PCDM_ReaderStatus.hxx>
 #include <PCDM_StoreStatus.hxx>
+#include <Standard_GUID.hxx>
+#include <Standard_Handle.hxx>
+#include <Standard_Type.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <TDataStd_Name.hxx>
@@ -31,9 +35,11 @@
 #include <TDocStd_Document.hxx>
 
 // ── STL ───────────────────────────────────────────────────────────────────────
+#include <algorithm>
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace CellForge {
 

@@ -8,6 +8,7 @@
 // ------------------------------------------------------------------------------------
 
 #include "Viewer.h"
+#include "ViewerInteractor.h"
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Line.hxx>
@@ -15,11 +16,19 @@
 #include <AIS_Shape.hxx>
 #include <Aspect_DisplayConnection.hxx>
 #include <Aspect_Handle.hxx>
+#include <Aspect_Window.hxx>
 #include <Geom_CartesianPoint.hxx>
-#include <Geom_Line.hxx>
+#include <Geom_Point.hxx>
+#include <Graphic3d_AspectFillArea3d.hxx>
+#include <Graphic3d_RenderingParams.hxx>
+#include <Graphic3d_TypeOfShadingModel.hxx>
 #include <OpenGl_GraphicDriver.hxx>
+#include <Prs3d_Drawer.hxx>
+#include <Prs3d_ShadingAspect.hxx>
+#include <Quantity_NameOfColor.hxx>
 #include <V3d_AmbientLight.hxx>
 #include <V3d_DirectionalLight.hxx>
+#include <V3d_TypeOfOrientation.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
 #ifdef _WIN32
@@ -27,6 +36,9 @@
 #else
 #  include <Xw_Window.hxx>
 #endif
+
+#include <algorithm>
+#include <gp_Pnt.hxx>
 
 namespace CellForge {
 

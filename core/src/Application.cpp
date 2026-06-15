@@ -10,6 +10,11 @@
 #include "CellForge/Application.h"
 #include "CellForge/Log.h"
 #include "CellForge/Assert.h"
+#include "CellForge/Base.h"
+#include "CellForge/Event/Event.h"
+#include "CellForge/IApplicationPlatform.h"
+
+#include <format>
 
 namespace CellForge {
 

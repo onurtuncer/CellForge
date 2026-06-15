@@ -10,6 +10,7 @@
 #pragma once
 
 #include "CellForge/IPersistanceBackend.h"
+#include "CellForge/Mathematics.h"
 
 #include <optional>
 #include <string>

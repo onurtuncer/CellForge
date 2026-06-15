@@ -10,15 +10,20 @@
 #include <CellForge/qt/widgets/ViewPortWidget.h>
 #include <CellForge/qt/input/QtEventMapper.h>
 
+#include <CellForge/Event/EventQueue.h>
 #include <CellForge/Event/KeyboardEvents.h>
 #include <CellForge/Event/MouseEvents.h>
 #include <CellForge/Event/ApplicationEvent.h>
+#include <CellForge/Input/KeyCodes.h>
 
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QResizeEvent>
 #include <QCloseEvent>
+
+#include <cstdint>
+#include <utility>
 
 namespace CellForge {
 

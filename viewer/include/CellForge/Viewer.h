@@ -17,6 +17,7 @@
 #include <AIS_DisplayMode.hxx>
 #include <AIS_Shape.hxx>
 #include <Quantity_Color.hxx>
+#include <Standard_Handle.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <CellForge/ViewerInteractor.h>
@@ -24,8 +25,6 @@
 #include <vector>
 
 class V3d_Viewer;
-class V3d_View;
-class AIS_InteractiveContext;
 
 namespace CellForge {
 

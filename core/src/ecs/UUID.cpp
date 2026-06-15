@@ -9,6 +9,7 @@
 
 #include "CellForge/ecs/UUID.h"
 
+#include <cstdint>
 #include <random>
 
 namespace CellForge {

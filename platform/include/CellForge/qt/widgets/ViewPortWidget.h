@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <CellForge/Event/Event.h>
 #include <CellForge/Event/EventQueue.h>
 #include <CellForge/IViewPortWidget.h>
 

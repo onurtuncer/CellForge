@@ -23,6 +23,11 @@
 #include <Aspect_Handle.hxx>
 #include <Aspect_ScrollDelta.hxx>
 #include <Aspect_VKey.hxx>
+#include <Aspect_VKeyFlags.hxx>
+#include <NCollection_Vec2.hxx>
+
+#include <cstdint>
+#include <utility>
 
 namespace CellForge {
 

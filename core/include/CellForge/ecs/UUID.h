@@ -9,7 +9,10 @@
 
 #pragma once
 
-#include "CellForge/Base.h"
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <string_view>
 
 namespace CellForge {
 

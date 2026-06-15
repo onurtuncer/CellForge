@@ -9,10 +9,10 @@
 
 #include "ViewerInteractor.h"
 
-#include <AIS_AnimationCamera.hxx>
+#include <AIS_DisplayMode.hxx>
 #include <AIS_InteractiveContext.hxx>
-#include <AIS_Shape.hxx>
-#include <Aspect_Grid.hxx>
+#include <Aspect_VKeySet.hxx>
+#include <V3d_TypeOfOrientation.hxx>
 #include <V3d_View.hxx>
 
 namespace CellForge {

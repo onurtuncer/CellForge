@@ -11,9 +11,16 @@
 
 // No OCAF headers here — they live exclusively in OcafPersistenceBackend.cpp.
 
+#include "CellForge/IGeometryBackend.h"
 #include "CellForge/IPersistanceBackend.h"
+#include "CellForge/Mathematics.h"
 
+#include <cstdint>
 #include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace CellForge {
 

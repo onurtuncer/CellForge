@@ -10,12 +10,12 @@
 #pragma once
 
 #include <AIS_ViewController.hxx>
-#include <NCollection_Array1.hxx>
-#include <TCollection_AsciiString.hxx>
-#include <gp_Pnt2d.hxx>
-
-class AIS_InteractiveContext;
-class V3d_View;
+#include <Aspect_VKey.hxx>
+#include <Aspect_VKeyFlags.hxx>
+#include <NCollection_Vec2.hxx>
+#include <Standard_Handle.hxx>
+#include <Standard_Transient.hxx>
+#include <Standard_Type.hxx>
 
 namespace CellForge {
 

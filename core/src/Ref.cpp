@@ -8,6 +8,7 @@
 // ------------------------------------------------------------------------------------
 
 #include "CellForge/Assert.h"
+#include "CellForge/Ref.h"
 
 #include <mutex>
 #include <unordered_set>
