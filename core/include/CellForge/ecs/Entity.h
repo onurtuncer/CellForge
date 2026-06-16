@@ -58,11 +58,11 @@ public:
 
     // Returns nullptr if the component is absent.
     template<typename T>
-    const T* get() const { return m_entity.get<T>(); }
+    const T* get() const { return m_entity.try_get<T>(); }
 
     // Returns nullptr if the component is absent.
     template<typename T>
-    T* getMut() { return m_entity.get_mut<T>(); }
+    T* getMut() { return m_entity.try_get_mut<T>(); }
 
     // ── Hierarchy ─────────────────────────────────────────────────────────────
 
