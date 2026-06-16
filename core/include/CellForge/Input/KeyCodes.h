@@ -15,9 +15,9 @@
 namespace CellForge{
 
     
-enum class KeyCode : uint16_t { 
+enum class KeyCode : uint16_t {
 
-
+None = 0,
 Space = 32,
 Apostrophe = 39, /* ' */
 Comma = 44, /* , */
