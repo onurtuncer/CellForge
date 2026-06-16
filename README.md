@@ -4,6 +4,7 @@
 [![Linux](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/linux.yml)
 [![Clang-Format](https://github.com/onurtuncer/CellForge/actions/workflows/clang_format.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/clang_format.yml)
 [![CMake-Format](https://github.com/onurtuncer/CellForge/actions/workflows/cmake_format.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/cmake_format.yml)
+[![CMake-Lint](https://github.com/onurtuncer/CellForge/actions/workflows/cmake_lint.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/cmake_lint.yml)
 [![IWYU](https://github.com/onurtuncer/CellForge/actions/workflows/iwyu.yml/badge.svg)](https://github.com/onurtuncer/CellForge/actions/workflows/iwyu.yml)
 [![codecov](https://codecov.io/gh/onurtuncer/CellForge/branch/main/graph/badge.svg)](https://codecov.io/gh/onurtuncer/CellForge)
 [![Documentation](https://github.com/onurtuncer/CellForge/actions/workflows/deploy-docs.yml/badge.svg)](https://onurtuncer.github.io/CellForge/)
